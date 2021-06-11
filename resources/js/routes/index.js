@@ -6,5 +6,6 @@ export default new VueRouter({
             path: '/',
             name: 'home',
         }
-    ]
+    ],
+    mode: 'history'
 })
