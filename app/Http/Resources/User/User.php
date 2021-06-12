@@ -3,6 +3,8 @@
 namespace App\Http\Resources\User;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Company\Company as CompanyResource;
+use App\Http\Resources\Role\Role as RoleResource;
 
 class User extends JsonResource
 {
@@ -18,7 +20,8 @@ class User extends JsonResource
             'id' => $this->resource->id,
             'name' => $this->resource->name,
             'email' => $this->resource->email,
-            'password' => $this->resource->password
+            'password' => $this->resource->password,
+            'role' => RoleResource::make($this->whenLoaded('role')),
         ];
     }
 }

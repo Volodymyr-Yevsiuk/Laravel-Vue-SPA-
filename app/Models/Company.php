@@ -14,6 +14,7 @@ class Company extends Model
         'name',
         'image',
         'description',
+        'address',
         'employees',
         'user_id',
         'created_at',
@@ -25,7 +26,8 @@ class Company extends Model
         'image' => 'string',
         'description' => 'string',
         'employees' => 'integer',
-        'user_id' => 'string'
+        'user_id' => 'string',
+        'address' => 'string'
     ];
 
     // Generate uuid

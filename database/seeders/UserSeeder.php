@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'name' => 'Volodymyr Yevsiuk',
             'email' => 'vov2706@gmail.com',
             'password' => bcrypt('password'),
-            'role_id' => Role::where('name', 'Admin')->first()->id
+            'role_id' => Role::where('name', 'Admin')->first()->id,
         ]);
     }
 }
