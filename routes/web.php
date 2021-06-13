@@ -19,3 +19,7 @@ Route::get('/', [IndexController::class, 'index'])->name('home');
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
+
+Route::get('{any}', function () {
+    return view('app');
+})->where('any','.*');

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Http\Resources\Product\Product as ProductResource;
 
 class ProductController extends Controller
 {
@@ -12,9 +14,18 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // if ($q = $request->get('q')) {
+        //     $products = Product::where('name', 'like', '%'.$q.'%')->paginate(15);
+        // } else {
+            $productsQuery = Product::query();
+            $products = $productsQuery->paginate(15);
+        // }
+
+        $products->load('user', 'company');
+
+        return ProductResource::collection($products);
     }
 
     /**
@@ -36,7 +47,10 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->load('user', 'company');
+
+        return ProductResource::make($product);
     }
 
     /**

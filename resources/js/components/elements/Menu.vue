@@ -1,10 +1,10 @@
 <template>
     <div class="navbar mx-auto font">
         <div class="not_auth mx-auto">
-            <router-link to="/products">Продукти</router-link>
+            <router-link :to="{name: 'products.index'}">Продукти</router-link>
             <router-link to="/companies">Компанії</router-link>
-            <router-link to="/login">Увійти</router-link>
-            <router-link to="/register">Зареєструватися</router-link>
+            <a href="/login">Увійти</a>
+            <a href="/register">Зареєструватися</a>
         </div>
         <div>
             <router-link to="/"></router-link>

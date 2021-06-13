@@ -5,7 +5,9 @@ export default new VueRouter({
         {
             path: '/',
             name: 'home',
-        }
+        },
+
+        ...require('./products').default,
     ],
     mode: 'history'
 })

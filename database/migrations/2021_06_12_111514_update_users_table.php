@@ -14,7 +14,7 @@ class UpdateUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->uuid('role_id');
+            $table->integer('role_id')->default(1);
         });
     }
 

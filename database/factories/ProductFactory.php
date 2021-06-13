@@ -25,9 +25,9 @@ class ProductFactory extends Factory
         $companies = \App\Models\Company::pluck('id');
 
         return [
-            'name' => $this->faker->sentence(rand(1, 3)),
+            'name' => $this->faker->text(rand(10, 30)),
             'price' => rand(20, 100),
-            'image' => $this->faker->imageUrl(250, 100),
+            'image' => $this->faker->imageUrl(270, 150),
             'description' => $this->faker->realText(500),
             'company_id' => $companies->random(),
             'user_id' => $users->random()
