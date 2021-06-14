@@ -21,6 +21,14 @@
         </style>
     </head>
     <body class="antialiased">
+        <script>
+                @if (auth()->user())
+                window.auth= {!! json_encode(new App\Http\Resources\User\User(auth()->user())
+                    , JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT | JSON_THROW_ON_ERROR) !!} ;
+                @else
+                    window.auth=null;
+                @endif
+        </script>
         <div id="app"></div>
         <script src="{{ mix('js/app.js') }}"></script>
     </body>

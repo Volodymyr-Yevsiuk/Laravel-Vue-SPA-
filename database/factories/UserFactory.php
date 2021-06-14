@@ -32,7 +32,8 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => bcrypt('password'), // password
             'remember_token' => Str::random(10),
-            'role_id' => $roles->random()
+            'role_id' => $roles->random(),
+            'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=35'
         ];
     }
 

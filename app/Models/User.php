@@ -63,24 +63,24 @@ class User extends Authenticatable
     ];
 
     // Generate uuid
-    public static function boot()
-    {
-        parent::boot();
+    // public static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            $model->{$model->getKeyName()} = (string) \Illuminate\Support\Str::uuid();
-        });
-    }
+    //     static::creating(function ($model) {
+    //         $model->{$model->getKeyName()} = (string) \Illuminate\Support\Str::uuid();
+    //     });
+    // }
 
-    public function getIncrementing()
-    {
-        return false;
-    }
+    // public function getIncrementing()
+    // {
+    //     return false;
+    // }
 
-    public function getKeyType()
-    {
-        return 'string';
-    }
+    // public function getKeyType()
+    // {
+    //     return 'string';
+    // }
 
     // Relationships
     public function role() 

@@ -22,6 +22,7 @@ class User extends JsonResource
             'email' => $this->resource->email,
             'password' => $this->resource->password,
             'role' => RoleResource::make($this->whenLoaded('role')),
+            'profile_photo_path' => $this->resource->profile_photo_path
         ];
     }
 }

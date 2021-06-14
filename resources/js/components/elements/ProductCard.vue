@@ -26,10 +26,6 @@ export default {
             type: Object,
             required: true
         },
-        viewProduct: {
-            type: Function,
-            // required: true
-        }
     },
 }
 </script>
@@ -48,6 +44,7 @@ export default {
 
     .card:hover {
         cursor: pointer;
+        box-shadow: 0px 0px 5px 0px rgb(232 230 230);
     }
 
     .card_container {
