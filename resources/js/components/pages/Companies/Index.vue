@@ -2,10 +2,10 @@
     <div>
         <div class="d-flex">
             <div class="d-flex content_block mx-auto content-center">
-                <product-card 
-                    v-for="product in products" 
-                    :key="product.id"
-                    :product="product"
+                <company-card 
+                    v-for="company in companies" 
+                    :key="company.id"
+                    :company="company"
                     @view="show"
                 />
             </div>
@@ -15,25 +15,25 @@
 </template>
 
 <script>
-import ProductCard from '../../elements/ProductCard.vue'
-import {loadProducts} from '../../../api/products'
+import CompanyCard from '../../elements/CompanyCard.vue'
+import {loadCompanies} from '../../../api/companies'
 
 export default {
     components: {
-        ProductCard
+        CompanyCard
     },
     data () {
         return {
-            products: {},
+            companies: {},
             page: 1,
             totalPages: 0
         }
     },
     async beforeRouteEnter(to, from, next) {
         await next(vm => {
-            loadProducts()
+            loadCompanies()
                 .then((response) => {
-                    vm.products = response.data.data
+                    vm.companies = response.data.data
                     vm.totalPages = response.data.meta.last_page ? response.data.meta.last_page : 0
                     vm.page = response.data.meta.current_page
                 })
@@ -41,9 +41,9 @@ export default {
         })
     },
     async beforeRouteUpdate(to, from, next) {
-        loadProducts()
+        loadCompanies()
             .then((response) => {
-                    this.products = response.data.data
+                    this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page ? response.data.meta.last_page : 0
                     this.page = response.data.meta.current_page
                 })
@@ -52,9 +52,9 @@ export default {
     },
     methods: {
         changePage(page = 1) {
-            loadProducts (page)
+            loadCompanies (page)
                 .then((response) => {
-                    this.products = response.data.data
+                    this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page
                     this.page = response.data.meta.current_page
                 })
@@ -62,7 +62,7 @@ export default {
         },
 
         show(id) {
-            this.$router.push({name: 'products.show', params: { id: id }})
+            this.$router.push({name: 'companies.show', params: { id: id }})
         }
     }
 }
@@ -70,8 +70,7 @@ export default {
 
 <style scoped>
     .content_block {
-        width: 1200px;
+        max-width: 900px;
         margin-top: 75px;
-        padding-left: 70px;
     }
 </style>

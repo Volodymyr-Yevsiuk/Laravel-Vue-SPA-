@@ -1,18 +1,18 @@
 import axios from 'axios'
 
-export const loadProducts = async function (query) {
+export const loadCompanies = async function (query) {
     return await axios({
         method: 'get',
-        url: '/api/products',
+        url: '/api/companies',
         params: {
             page: query
         }
     })
 } 
 
-export const loadProduct = async function (id) {
+export const loadCompany = async function (id) {
     return await axios({
         method: 'get',
-        url: `/api/products/${id}`
+        url: `/api/companies/${id}`
     })
 }

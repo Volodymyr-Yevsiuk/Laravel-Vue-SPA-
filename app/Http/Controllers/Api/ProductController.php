@@ -16,12 +16,8 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // if ($q = $request->get('q')) {
-        //     $products = Product::where('name', 'like', '%'.$q.'%')->paginate(15);
-        // } else {
-            $productsQuery = Product::query();
-            $products = $productsQuery->paginate(15);
-        // }
+        $productsQuery = Product::query();
+        $products = $productsQuery->paginate(15);
 
         $products->load('user', 'company');
 

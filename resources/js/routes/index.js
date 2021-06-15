@@ -8,6 +8,8 @@ export default new VueRouter({
         },
 
         ...require('./products').default,
+        ...require('./companies').default,
+        ...require('./users').default,
     ],
     mode: 'history'
 })

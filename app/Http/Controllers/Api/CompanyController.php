@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Company;
+use App\Http\Resources\Company\Company as CompanyResource;
 
 class CompanyController extends Controller
 {
@@ -14,7 +16,12 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
+        $companiesQuery = Company::query();
+        $companies = $companiesQuery->paginate(10);
+
+        $companies->load('user');
+
+        return CompanyResource::collection($companies);
     }
 
     /**
@@ -36,7 +43,10 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        //
+        $company = Company::findOrFail($id);
+        $company->load('user');
+
+        return CompanyResource::make($company);
     }
 
     /**

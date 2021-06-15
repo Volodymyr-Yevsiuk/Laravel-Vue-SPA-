@@ -1,25 +1,25 @@
 <template>
     <div>
         <div class="show-content mx-auto">
-            <img :src="product.image" class="product-img">
-            <div class="d-flex product-block">
+            <img :src="company.image" class="company-img">
+            <div class="d-flex company-block">
                 <label for="name">Назва:</label>
-                <span id="name">{{product.name}}</span>
+                <span id="name">{{company.name}}</span>
             </div>
-            <div class="d-flex product-block">
-                <label for="price">Ціна:</label>
-                <span id="price">{{product.price}} грн</span>
+            <div class="d-flex company-block">
+                <label for="user">Засновник:</label>
+                <router-link :to="{name: 'users.show', params: {id: user.id}}" id="user">{{user.name}}</router-link>
             </div>
-            <div class="d-flex product-block">
-                <label for="company">Виробник:</label>
-                <router-link :to="{name: 'companies.show', params: {id: company.id}}" id="company">{{company.name}}</router-link>
+            <div class="d-flex company-block">
+                <label for="price">К-сть співробіників:</label>
+                <span id="price">Понад {{company.employees}} працівників</span>
             </div>
-            <div class="d-flex product-block">
+            <div class="d-flex company-block">
                 <label for="description">Опис:</label>
-                <span id="description">{{product.description}}</span>
+                <span id="description">{{company.description}}</span>
             </div>
             <div>
-                <router-link :to="{name: 'products.index'}">
+                <router-link :to="{name: 'companies.index'}">
                     Повернутися назад
                     <i class="fas fa-long-arrow-alt-right"></i>
                 </router-link>
@@ -29,30 +29,30 @@
 </template>
 
 <script>
-import {loadProduct} from '../../../api/products'
+import {loadCompany} from '../../../api/companies'
 
 export default {
     data() {
         return {
-            product: {},
-            company: {}
+            company: {},
+            user: {}
         }
     },
     async beforeRouteEnter (to, from, next) {
         await next(vm => {
-            loadProduct(to.params.id)
+            loadCompany(to.params.id)
                 .then(response => {
-                    vm.product = response.data.data
-                    vm.company = response.data.data.company
+                    vm.company = response.data.data
+                    vm.user = response.data.data.user
                 })
                 .catch(err => console.error(err))
         }) 
     },
     async beforeRouteUpdate (to, from, next) {
-        await loadProduct(to.params.id)
+        await loadCompany(to.params.id)
             .then(response => {
-                    this.product = response.data.data
-                    this.company = response.data.data.company
+                    this.company = response.data.data
+                    this.user = response.data.data.user
                 })
             .catch(err => console.error(err))
         next()
@@ -75,18 +75,18 @@ export default {
         font-weight: 600;
     }
 
-    #company {
+    #user {
         color: rgb(0, 158, 179);
         text-decoration: none;
         transition: all 1s;
     }
 
-    #company:hover {
+    #user:hover {
         color: rgb(1, 92, 104);
         text-decoration: underline;
     }
 
-    .product-block {
+    .company-block {
         margin-bottom: 20px;;
     }
 
@@ -94,7 +94,7 @@ export default {
         font-size: 25px;
     }
 
-    .product-img {
+    .company-img {
         margin-bottom: 40px;
     }
 </style>
