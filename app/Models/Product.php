@@ -16,7 +16,6 @@ class Product extends Model
         'description',
         'price',
         'company_id',
-        'user_id',
         'created_at',
         'updated_at'
     ];
@@ -27,7 +26,6 @@ class Product extends Model
         'description' => 'string',
         'price' => 'integer',
         'company_id' => 'string',
-        'user_id' => 'string'
     ];
 
     // Generate uuid
@@ -51,11 +49,6 @@ class Product extends Model
     }
 
     //Relationships
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function company()
     {
         return $this->belongsTo(Company::class);

@@ -22,7 +22,6 @@ class Company extends JsonResource
             'description' => $this->resource->description,
             'address' => $this->resource->address,
             'employees' => $this->resource->employees,
-            'user' => UserResource::make($this->whenLoaded('user')),
         ];
     }
 }

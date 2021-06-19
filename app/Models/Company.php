@@ -16,7 +16,6 @@ class Company extends Model
         'description',
         'address',
         'employees',
-        'user_id',
         'created_at',
         'updated_at'
     ];
@@ -26,7 +25,6 @@ class Company extends Model
         'image' => 'string',
         'description' => 'string',
         'employees' => 'integer',
-        'user_id' => 'string',
         'address' => 'string'
     ];
 
@@ -51,9 +49,9 @@ class Company extends Model
     }
 
     //Relationships
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(User::class);
     }
 
     public function products()

@@ -2,6 +2,7 @@
     <div>
         <div class="d-flex">
             <div class="d-flex content_block mx-auto content-center">
+                <vs-button class="create-button mx-auto" @click="toCreate">Створити продукт</vs-button>
                 <product-card 
                     v-for="product in products" 
                     :key="product.id"
@@ -63,6 +64,10 @@ export default {
 
         show(id) {
             this.$router.push({name: 'products.show', params: { id: id }})
+        },
+
+        toCreate() {
+            this.$router.push({name: 'products.create'})
         }
     }
 }
@@ -73,5 +78,13 @@ export default {
         width: 1200px;
         margin-top: 75px;
         padding-left: 70px;
+    }
+
+    .create-button {
+        font-size: 18px;
+        padding: 5px;
+        position: relative;
+        left: 38%;
+        margin-bottom: 50px;
     }
 </style>

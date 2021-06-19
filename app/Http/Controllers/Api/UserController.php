@@ -42,7 +42,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        $user->load('role', 'products', 'company');
+        $user->load('role', 'company');
 
         return UserResource::make($user);
     }

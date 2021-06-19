@@ -20,7 +20,6 @@ class CreateProductsTable extends Migration
             $table->integer('price');
             $table->text('description');
             $table->uuid('company_id');
-            $table->uuid('user_id');
             $table->timestamps();
         });
     }

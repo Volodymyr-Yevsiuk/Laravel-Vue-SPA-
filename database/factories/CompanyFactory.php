@@ -22,7 +22,6 @@ class CompanyFactory extends Factory
     public function definition()
     {
         $employees = collect([10, 20, 30, 40, 50, 100, 200, 500]);
-        $userIds = \App\Models\User::pluck('id');
 
         return [
             'name' => $this->faker->company,
@@ -30,7 +29,6 @@ class CompanyFactory extends Factory
             'image' => $this->faker->imageUrl(100, 100),
             'description' => $this->faker->realText(1000),
             'address' => $this->faker->address,
-            'user_id' => $userIds->random()
         ];
     }
 }

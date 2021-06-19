@@ -24,7 +24,6 @@ class Product extends JsonResource
             'description' => $this->resource->description,
             'price' => $this->resource->price,
             'company'=> CompanyResource::make($this->whenLoaded('company')),
-            'user' => UserResource::make($this->whenLoaded('user')),
         ];
     }
 }

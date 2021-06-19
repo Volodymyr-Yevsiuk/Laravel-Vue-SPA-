@@ -27,7 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'company_id'
     ];
 
     /**
@@ -61,26 +62,6 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
-
-    // Generate uuid
-    // public static function boot()
-    // {
-    //     parent::boot();
-
-    //     static::creating(function ($model) {
-    //         $model->{$model->getKeyName()} = (string) \Illuminate\Support\Str::uuid();
-    //     });
-    // }
-
-    // public function getIncrementing()
-    // {
-    //     return false;
-    // }
-
-    // public function getKeyType()
-    // {
-    //     return 'string';
-    // }
 
     // Relationships
     public function role() 

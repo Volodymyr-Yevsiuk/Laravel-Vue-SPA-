@@ -15,6 +15,7 @@ class UpdateUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->integer('role_id')->default(1);
+            $table->uuid('company_id')->nullable();
         });
     }
 

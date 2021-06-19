@@ -21,7 +21,6 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
-        $users = \App\Models\User::pluck('id');
         $companies = \App\Models\Company::pluck('id');
 
         return [
@@ -30,7 +29,6 @@ class ProductFactory extends Factory
             'image' => $this->faker->imageUrl(270, 150),
             'description' => $this->faker->realText(500),
             'company_id' => $companies->random(),
-            'user_id' => $users->random()
         ];
     }
 }
