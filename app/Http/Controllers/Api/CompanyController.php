@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Http\Resources\Company\Company as CompanyResource;
+use App\Http\Requests\Company\StoreRequest;
 
 class CompanyController extends Controller
 {
@@ -30,9 +31,15 @@ class CompanyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        //
+        $pathToFile = $request->file('image')->store('images', 'public');
+        $data = $request->validated();
+        $data['image'] = $request->image->hashName();
+
+        $company = Company::create($data);
+
+        return new CompanyResource($company);
     }
 
     /**

@@ -16,3 +16,7 @@ export const loadCompany = async function (id) {
         url: `/api/companies/${id}`
     })
 }
+
+export const storeCompany = async function (formdata, config) {
+    return await axios.post('/api/companies', formdata, config)
+}

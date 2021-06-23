@@ -10,7 +10,6 @@
 <script>
 import ProductsForm from './Form.vue'
 import { storeProduct } from '../../../api/products'
-import axios from 'axios' 
 
 export default {
     components: {ProductsForm},
@@ -25,9 +24,14 @@ export default {
             }
         }
     },
-    async beforeRouteEnter (to, from, next) {
+    beforeRouteEnter (to, from, next) {
         next((vm) => {
-            vm.form.company_id = vm.currentAuthorizedUser.company.id
+            if (vm.currentAuthorizedUser.company !== null) {
+                vm.form.company_id = vm.currentAuthorizedUser.company.id
+            } else {
+                vm.$router.push({name: 'companies.create'})
+                console.log('Спочатку зареєструйте компанію')
+            }
         })
     },
     methods: {

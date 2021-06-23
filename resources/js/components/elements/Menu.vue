@@ -16,8 +16,14 @@
                     <i class="fas fa-angle-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/dashboard" class="dropdown-link">Профіль</a>
-                    <a href="/logout" class="dropdown-link">Вийти</a>
+                    <div class="dropdown-block">
+                        <i class="fas fa-user"></i>
+                        <router-link :to="{name: 'dashboard'}" class="dropdown-link">Профіль</router-link>
+                    </div>     
+                    <div class="dropdown-block">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <a href="/logout" class="dropdown-link" id="logout">Вийти</a>
+                    </div>
                 </div>
             </div>  
             
@@ -85,6 +91,9 @@ export default {
         border-radius: 10px;
         padding: 15px;
         font-size: 18px;
+        background: #fff;
+        position: relative;
+        z-index: 2px;
     }
 
     .dropdown:hover .dropdown-content {
@@ -97,7 +106,7 @@ export default {
         height: 30px; 
     }
 
-    .dropdown-link:first-child{
+    .dropdown-block:first-child{
         border-bottom: .5px solid rgb(201, 199, 199);
     }
 
@@ -109,5 +118,15 @@ export default {
 
     .dropdown:hover .fa-angle-down {
         color: rgb(61, 59, 59);
+    }
+
+    .dropdown-block {
+        display: flex;
+        align-items: center;
+        height: 30px;
+    }
+
+    .dropdown-block .fas {
+        margin-right: 5px;
     }
 </style>

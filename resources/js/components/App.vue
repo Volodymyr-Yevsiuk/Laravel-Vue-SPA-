@@ -10,6 +10,6 @@ import Menu from './elements/Menu'
 
 export default {
     components: { Menu },
-    name: 'App'
+    name: 'App',
 }
 </script>

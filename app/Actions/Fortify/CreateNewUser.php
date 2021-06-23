@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use Carbon\Carbon;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -32,7 +33,8 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
             'role_id' => 1,
-            'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y'
+            'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y',
+            'created_at' => Carbon::now()
         ]);
     }
 }

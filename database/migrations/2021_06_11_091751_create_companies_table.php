@@ -20,6 +20,7 @@ class CreateCompaniesTable extends Migration
             $table->string('image');
             $table->text('description');
             $table->string('address');
+            $table->integer('user_id');
             $table->timestamps();
         });
     }

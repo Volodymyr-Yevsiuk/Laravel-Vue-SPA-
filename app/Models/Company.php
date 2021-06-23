@@ -16,6 +16,7 @@ class Company extends Model
         'description',
         'address',
         'employees',
+        'user_id',
         'created_at',
         'updated_at'
     ];
@@ -25,7 +26,8 @@ class Company extends Model
         'image' => 'string',
         'description' => 'string',
         'employees' => 'integer',
-        'address' => 'string'
+        'address' => 'string',
+        'user_id' => 'integer'
     ];
 
     // Generate uuid
@@ -49,9 +51,9 @@ class Company extends Model
     }
 
     //Relationships
-    public function users()
+    public function user()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function products()

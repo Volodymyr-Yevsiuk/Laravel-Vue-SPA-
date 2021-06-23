@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Role;
-use App\Models\Company;
+use Carbon\Carbon;
 
 class UserSeeder extends Seeder
 {
@@ -19,13 +19,15 @@ class UserSeeder extends Seeder
     {
         User::factory()->count(50)->create();
 
-        DB::table('users')->insert([
-            'name' => 'Volodymyr Yevsiuk',
-            'email' => 'vov2706@gmail.com',
-            'password' => bcrypt('password'),
-            'role_id' => Role::where('name', 'Admin')->first()->id,
-            'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=35',
-            'company_id' => Company::pluck('id')->random()
-        ]);
+        DB::table('users')->insert(
+            [
+                'name' => 'Volodymyr Yevsiuk',
+                'email' => 'vov2706@gmail.com',
+                'password' => bcrypt('password'),
+                'role_id' => Role::where('name', 'Admin')->first()->id,
+                'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=35',
+                'created_at' => Carbon::now()
+            ]
+        );
     }
 }

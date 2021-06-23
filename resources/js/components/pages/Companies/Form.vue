@@ -10,21 +10,31 @@
                         id="name" 
                         v-model="form.name" 
                         class="form-input" 
-                        placeholder="Введіть назву продукта"
+                        placeholder="Введіть назву компанії"
                     />
                 </div>
                 <div class="form-block">
-                    <label for="price">Ціна(грн):</label>
-                    <vs-input 
+                    <label for="employees">Кількість працівників:</label>
+                    <vs-select 
                         type="number" 
-                        name="price" 
-                        id="price" 
-                        v-model="form.price" 
+                        name="employees" 
+                        id="employees" 
+                        v-model="form.employees" 
                         class="form-input" 
-                        placeholder="Введіть ціну продукта"/>
+                        placeholder="Виберіть приблизну к-сть працівників"
+                    >
+                        <vs-option 
+                            v-for="(number, i) in numbers"
+                            :key="i"
+                            :label="`Понад ${number} працівників`"
+                            :value="number"
+                        >
+                            Понад {{ number }}
+                        </vs-option>
+                    </vs-select>
                 </div>
                  <div class="form-block">
-                    <label for="image">Зображення:</label>
+                    <label for="image">Логотип компанії(100х100):</label>
                     <vs-input 
                         type="file" 
                         name="image" 
@@ -33,9 +43,20 @@
                         @change="loadImage"
                     />
                 </div>
+                 <div class="form-block">
+                    <label for="address">Адреса:</label>
+                    <vs-input 
+                        type="text" 
+                        name="address" 
+                        id="address" 
+                        v-model="form.address" 
+                        class="form-input" 
+                        placeholder="Місто, вулиця"
+                    />
+                </div>
                 <div class="textarea-block">
                     <label for="description">Опис:</label>
-                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть продукт"></textarea>
+                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть компанію"></textarea>
                 </div>
                 <vs-button type="submit" class="create-button">Створити</vs-button>
             </form>
@@ -49,6 +70,11 @@ export default {
         value: {
             type: Object,
             required: true
+        }
+    },
+    data() {
+        return {
+            numbers: [10, 20, 30, 40, 50, 100, 250, 500, 1000]
         }
     },
     computed: {

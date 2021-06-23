@@ -2,6 +2,7 @@
     <div>
         <div class="d-flex">
             <div class="d-flex content_block mx-auto content-center">
+                <vs-button class="create-button mx-auto" @click="toCreate">Зареєструвати компанію</vs-button>
                 <company-card 
                     v-for="company in companies" 
                     :key="company.id"
@@ -63,6 +64,10 @@ export default {
 
         show(id) {
             this.$router.push({name: 'companies.show', params: { id: id }})
+        },
+
+        toCreate() {
+            this.$router.push({name: 'companies.create'})
         }
     }
 }
@@ -72,5 +77,13 @@ export default {
     .content_block {
         max-width: 900px;
         margin-top: 75px;
+    }
+
+    .create-button {
+        font-size: 18px;
+        padding: 5px;
+        position: relative;
+        left: 38%;
+        margin-bottom: 50px;
     }
 </style>

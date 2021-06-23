@@ -24,18 +24,14 @@ class UserFactory extends Factory
      */
     public function definition()
     {
-        $roles = \App\Models\Role::pluck('id');
-        $companies = \App\Models\Company::pluck('id');
-
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => bcrypt('password'), // password
             'remember_token' => Str::random(10),
-            'role_id' => $roles->random(),
+            'role_id' => 1,
             'profile_photo_path' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=35',
-            'company_id' => $companies->random()
         ];
     }
 
