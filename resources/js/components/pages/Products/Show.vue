@@ -19,7 +19,7 @@
                 <span id="description">{{product.description}}</span>
             </div>
             <div>
-                <router-link :to="{name: 'products.index'}">
+                <router-link :to="{path: prevRoute}">
                     Повернутися назад
                     <i class="fas fa-long-arrow-alt-right"></i>
                 </router-link>
@@ -35,7 +35,8 @@ export default {
     data() {
         return {
             product: {},
-            company: {}
+            company: {},
+            prevRoute: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -44,6 +45,7 @@ export default {
                 .then(response => {
                     vm.product = response.data.data
                     vm.company = response.data.data.company
+                    vm.prevRoute = from.path
                 })
                 .catch(err => console.error(err))
         }) 
@@ -53,6 +55,7 @@ export default {
             .then(response => {
                     this.product = response.data.data
                     this.company = response.data.data.company
+                    this.prevRoute = from.path
                 })
             .catch(err => console.error(err))
         next()

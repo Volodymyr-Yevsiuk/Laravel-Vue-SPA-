@@ -21,11 +21,13 @@ export default {
                 description: '',
                 image: '',
                 company_id: ''
-            }
+            },
+            prevRoutePath: ''
         }
     },
     beforeRouteEnter (to, from, next) {
         next((vm) => {
+            vm.prevRoutePath = from.path
             if (vm.currentAuthorizedUser.company !== null) {
                 vm.form.company_id = vm.currentAuthorizedUser.company.id
             } else {
@@ -46,7 +48,7 @@ export default {
             
             return storeProduct(formData, config)
                 .then(() => {
-                    this.$router.push({ name: 'products.index' });
+                    this.$router.push({ path: this.prevRoutePath });
                 })
                 .catch((err) => console.error(err))
         }

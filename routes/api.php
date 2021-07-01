@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/companies/{company}/products', [CompanyController::class, 'getCompanyProducts'])->name('companies.products');
+
 Route::apiResources([
     'users' => UserController::class,
     'products' => ProductController::class,

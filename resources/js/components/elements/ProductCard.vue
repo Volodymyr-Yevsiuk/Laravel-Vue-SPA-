@@ -33,7 +33,7 @@ export default {
 <style scoped>
     .card {
         width: 300px;
-        height: 370px;
+        height: 400px;
         display: inline-block;
         margin-bottom: 50px;
         padding: 15px;
@@ -63,6 +63,10 @@ export default {
         display: flex;
         padding-left: 15px;
         margin-top: 25px;
+    }
+
+    .def-block:last-child {
+        margin-top: 15px;
     }
 
     .view {

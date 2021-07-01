@@ -19,7 +19,7 @@
                 <span id="description">{{company.description}}</span>
             </div>
             <div>
-                <router-link :to="{name: 'companies.index'}">
+                <router-link :to="{path: prevRoute}">
                     Повернутися назад
                     <i class="fas fa-long-arrow-alt-right"></i>
                 </router-link>
@@ -35,7 +35,8 @@ export default {
     data() {
         return {
             company: {},
-            user: {}
+            user: {},
+            prevRoute: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -44,6 +45,7 @@ export default {
                 .then(response => {
                     vm.company = response.data.data
                     vm.user = response.data.data.user
+                    vm.prevRoute = from.path
                 })
                 .catch(err => console.error(err))
         }) 
@@ -53,10 +55,12 @@ export default {
             .then(response => {
                     this.company = response.data.data
                     this.user = response.data.data.user
+                    this.prevRoute = from.path
                 })
             .catch(err => console.error(err))
         next()
-    }
+    },
+
 }
 </script>
 

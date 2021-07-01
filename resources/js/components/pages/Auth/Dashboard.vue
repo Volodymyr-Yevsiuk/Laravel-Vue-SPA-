@@ -17,30 +17,90 @@
                 <div class="content-block">
                     <label for="role">Компанії, якими ви володієте:</label>
                     <span id="role">{{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}</span>
-                    <router-link v-if="user.company == null" :to="{name: ''}">Зареєструвати свою компанію</router-link>
+                    <vs-button v-if="user.company == null" @click="registerCompany">Зареєструвати свою компанію</vs-button>
                 </div>
                 <div class="content-block">
                     <label for="created_at">Дата створення акаунта:</label>
                     <span id="created_at">{{ user.created_at }}</span>
                 </div>
+                <div class="content-block">
+                    <vs-button class="logout">
+                        <a href="/logout">Вийти з акаунта</a>
+                    </vs-button>
+                </div>
+            </div>
+        </div>
+        <div v-if="user.company" class="products">
+            <h1 class="products-title">Ваші товари</h1>
+            <div>
+                <vs-button class="create-button mx-auto" @click="toCreate">Створити продукт</vs-button>
+                <product-card 
+                    v-for="product in products" 
+                    :key="product.id"
+                    :product="product"
+                    @view="show"
+                />
+                <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import moment from 'moment'
+import ProductCard from '../../elements/ProductCard.vue'
+import {loadCompanyProducts} from '../../../api/companies'
+
 export default {
+    components: {
+        ProductCard
+    },
     data () {
         return {
             user: null,
             photo: null,
-            role: null
+            role: null,
+            products: {},
+            page: 1,
+            totalPages: 0
         }
     },
-    mounted() {
-        this.user = this.currentAuthorizedUser
-        this.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
-        this.role = this.user.role
+    async beforeRouteEnter (to, from, next) {
+        await next(vm => {
+            vm.user = vm.currentAuthorizedUser
+            vm.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
+            vm.role = vm.currentAuthorizedUser.role
+            vm.user.created_at = moment(vm.user.created_at).calendar()
+
+            loadCompanyProducts(vm.user.company.id)
+            .then(response => {
+                vm.products = response.data.data
+            })  
+            .catch(err => console.error(err))
+        })
+    },
+    methods: {
+        registerCompany () {
+            this.$router.push({name: 'companies.create'})
+        },
+        changePage(page = 1) {
+            loadProducts (page)
+                .then((response) => {
+                    this.products = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                })
+                .catch((err) => console.error(err))
+        },
+
+        show(id) {
+            this.$router.push({name: 'products.show', params: { id: id }})
+        },
+
+        toCreate() {
+            this.$router.push({name: 'products.create'})
+        }
+
     }
 }
 </script>
@@ -48,11 +108,19 @@ export default {
 <style scoped>
     .profile-block {
         width: 900px;
-        height: 400px;
+        height: 500px;
         margin: 0 auto;
         border: .5px solid rgb(201, 200, 200);
         margin-top: 50px;
         padding: 50px;
+    }
+
+    .create-button {
+        font-size: 18px;
+        padding: 5px;
+        position: relative;
+        left: 38%;
+        margin-bottom: 50px;
     }
 
     .profile-photo {
@@ -62,5 +130,25 @@ export default {
     .content-block {
         border-bottom: .5px solid rgb(124, 124, 124);
         margin-bottom: 15px;
+    }
+
+    .content-block:last-child {
+        border-bottom: 0;
+    }
+
+    .products {
+        width: 900px;
+        margin: 0 auto;
+        margin-top: 50px;
+    }
+
+    .products-title {
+        border-bottom: .5px solid;
+        margin-bottom: 50px;
+    }
+
+    .logout {
+        font-size: 16px;
+        padding: 5px;
     }
 </style>

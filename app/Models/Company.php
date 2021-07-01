@@ -58,6 +58,6 @@ class Company extends Model
 
     public function products()
     {
-        return $this->hasMany(Company::class);
+        return $this->hasMany(Product::class);
     }
 }

@@ -1,9 +1,9 @@
-import DashBoard from '../components/pages/Auth/DashBoard'
+import Dashboard from '../components/pages/Auth/Dashboard.vue'
 
 export default [
     {
         path: '/dashboard',
         name: 'dashboard',
-        component: DashBoard
+        component: Dashboard
     }
 ]

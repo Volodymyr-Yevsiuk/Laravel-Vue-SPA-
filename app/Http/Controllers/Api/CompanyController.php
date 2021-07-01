@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Http\Resources\Company\Company as CompanyResource;
+use App\Http\Resources\Product\Product as ProductResource;
 use App\Http\Requests\Company\StoreRequest;
 
 class CompanyController extends Controller
@@ -77,5 +78,14 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getCompanyProducts ($id) {
+        $company = Company::findOrFail($id);
+
+        $products = $company->products;
+        $products->load('company');
+        
+        return ProductResource::collection($products);
     }
 }
