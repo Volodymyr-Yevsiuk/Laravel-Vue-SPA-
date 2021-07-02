@@ -1,7 +1,7 @@
 <template>
     <div class="card shadow-md" @click="$emit('view', company.id)">
         <div class="card_container d-flex flex-col content-center items-center ">
-            <img :src="company.image" class="mx-auto" />
+            <img :src="`/images/${company.image}`" class="mx-auto" />
             <p class="name">{{ company.name }}</p>
             <div class="def-block">
                 <label for="employees">К-сть співробітників: </label>

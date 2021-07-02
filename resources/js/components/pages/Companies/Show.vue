@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="show-content mx-auto">
-            <img :src="company.image" class="company-img">
+            <img :src="`/images/${company.image}`" class="company-img">
             <div class="d-flex company-block">
                 <label for="name">Назва:</label>
                 <span id="name">{{company.name}}</span>

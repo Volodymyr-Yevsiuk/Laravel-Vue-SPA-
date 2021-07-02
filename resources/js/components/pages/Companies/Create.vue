@@ -32,7 +32,7 @@ export default {
             if (vm.currentAuthorizedUser !== null) {
                 vm.form.user_id = vm.currentAuthorizedUser.id
             } else {
-                vm.$router.push('/login')
+                window.location.href = '/login'
                 console.log('Авторизуйтесь будь ласка')
             }
         })
@@ -49,10 +49,10 @@ export default {
             formData.append('user_id', this.form.user_id);
             
             storeCompany(formData, config)
-                .then(() => {
-                    this.$router.push(this.prevRoutePath);
-                })
-                .catch((err) => console.error(err))
+            .then(() => {
+                this.$router.push(this.prevRoutePath);
+            })
+            .catch((err) => console.error(err))
         }
     }
 }

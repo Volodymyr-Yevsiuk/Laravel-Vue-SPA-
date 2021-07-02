@@ -28,12 +28,17 @@ export default {
     beforeRouteEnter (to, from, next) {
         next((vm) => {
             vm.prevRoutePath = from.path
-            if (vm.currentAuthorizedUser.company !== null) {
-                vm.form.company_id = vm.currentAuthorizedUser.company.id
+            if (vm.currentAuthorizedUser !== null) {
+                if (vm.currentAuthorizedUser.company !== null) {
+                    vm.form.company_id = vm.currentAuthorizedUser.company.id
+                } else {
+                    vm.$router.push({name: 'companies.create'})
+                    console.log('Спочатку зареєструйте компанію')
+                }
             } else {
-                vm.$router.push({name: 'companies.create'})
-                console.log('Спочатку зареєструйте компанію')
-            }
+                window.location.href = '/login';
+            }  
+            
         })
     },
     methods: {

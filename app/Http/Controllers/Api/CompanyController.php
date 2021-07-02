@@ -8,6 +8,8 @@ use App\Models\Company;
 use App\Http\Resources\Company\Company as CompanyResource;
 use App\Http\Resources\Product\Product as ProductResource;
 use App\Http\Requests\Company\StoreRequest;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -34,9 +36,12 @@ class CompanyController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $pathToFile = $request->file('image')->store('images', 'public');
+        $image = Image::make($request->file('image'))->resize(100, 100);
+        $rndStr = Str::random(15);
+        $image->save(public_path().'/images/'.$rndStr.'.jpg');
+
         $data = $request->validated();
-        $data['image'] = $request->image->hashName();
+        $data['image'] = $rndStr.'.jpg';
 
         $company = Company::create($data);
 

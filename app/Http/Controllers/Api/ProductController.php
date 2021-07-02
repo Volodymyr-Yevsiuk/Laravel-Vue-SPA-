@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\Product\Product as ProductResource;
 use App\Http\Requests\Product\StoreRequest;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -33,9 +35,12 @@ class ProductController extends Controller
      */
     public function store(StoreRequest $request)
     {   
-        $pathToFile = $request->file('image')->store('images', 'public');
+        $image = Image::make($request->file('image'))->resize(270, 150);
+        $rndStr = Str::random(10);
+        $image->save(public_path().'/images/'.$rndStr.'.jpg');
+
         $data = $request->validated();
-        $data['image'] = $request->image->hashName();
+        $data['image'] = $rndStr.'.jpg';
 
         $product = Product::create($data);
 

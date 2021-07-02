@@ -1,7 +1,7 @@
 <template>
     <div class="card shadow-md" @click="$emit('view', product.id)">
         <div class="card_container d-flex flex-col content-center items-center ">
-            <img :src="product.image" />
+            <img :src="`/images/${product.image}`" />
             <p class="name">{{ product.name }}</p>
             <div class="def-block">
                 <label for="price">Ціна: </label>
