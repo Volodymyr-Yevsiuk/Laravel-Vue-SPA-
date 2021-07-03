@@ -1,6 +1,7 @@
 import Index from '../components/pages/Products/Index'
 import Show from '../components/pages/Products/Show'
 import Create from '../components/pages/Products/Create'
+import Edit from '../components/pages/Products/Edit'
 
 export default [
     {
@@ -13,6 +14,12 @@ export default [
         path: '/products/create',
         name: 'products.create',
         component: Create
+    },
+
+    {
+        path: '/products/:id/edit',
+        name: 'products.edit',
+        component: Edit
     },
 
     {

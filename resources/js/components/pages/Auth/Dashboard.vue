@@ -67,16 +67,21 @@ export default {
     },
     async beforeRouteEnter (to, from, next) {
         await next(vm => {
-            vm.user = vm.currentAuthorizedUser
-            vm.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
-            vm.role = vm.currentAuthorizedUser.role
-            vm.user.created_at = moment(vm.user.created_at).calendar()
+            if (vm.currentAuthorizedUser != null) {
+                vm.user = vm.currentAuthorizedUser
+                vm.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
+                vm.role = vm.currentAuthorizedUser.role
+                vm.user.created_at = moment(vm.user.created_at).calendar()
 
-            loadCompanyProducts(vm.user.company.id)
-            .then(response => {
-                vm.products = response.data.data
-            })  
-            .catch(err => console.error(err))
+                loadCompanyProducts(vm.user.company.id)
+                .then(response => {
+                    vm.products = response.data.data
+                })  
+                .catch(err => console.error(err))
+            } else {
+                window.location.href = '/login'
+            }
+            
         })
     },
     methods: {

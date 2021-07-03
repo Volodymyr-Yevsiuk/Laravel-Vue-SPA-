@@ -3,9 +3,8 @@
 namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\Product\UpdateRequest;
 
-class StoreRequest extends UpdateRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,10 +23,11 @@ class StoreRequest extends UpdateRequest
      */
     public function rules()
     {
-        $rules = parent::rules();
-
-        $rules['company_id'] = ['required', 'exists:App\Models\Company,id'];
-        
-        return $rules;
+        return [
+            'name' => ['string', 'max:100'],
+            'price' => ['numeric'],
+            'image' => ['image'],
+            'description' => ['string', 'max:1500'],
+        ];
     }
 }

@@ -2,7 +2,15 @@
     <div class="card shadow-md" @click="$emit('view', product.id)">
         <div class="card_container d-flex flex-col content-center items-center ">
             <img :src="`/images/${product.image}`" />
-            <p class="name">{{ product.name }}</p>
+            <div class="name-block">
+                <p class="name">{{ product.name }}</p>
+                <router-link :to="{name: 'products.edit', params: { id: product.id} }">
+                    <i class="fas fa-edit"></i>
+                </router-link>
+                <router-link>
+                    <i class="fas fa-trash-alt"></i>
+                </router-link>
+            </div>
             <div class="def-block">
                 <label for="price">Ціна: </label>
                 <span id="price" class="sp">{{product.price}} грн</span>
@@ -51,12 +59,32 @@ export default {
         position: relative;
     }
 
+    .name-block {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        border-bottom: .5px solid rgb(126, 124, 124);
+    }
+
+    .fa-edit {
+        margin-left: 15px;
+        color: rgb(15, 144, 196);
+        transition: .5s all;
+    }
+
+    .fa-edit:hover {
+        font-size: 18px;
+        color: rgb(11, 97, 131);
+    }
+
+    .fas:last-child {
+        margin-left: 5px;
+    }
+
     .name {
-        margin: 3px;
-        text-align: center;
         font-size: 18px;
         font-weight: 600;
-        border-bottom: .5px solid rgb(126, 124, 124);
+        margin: 5px auto;
     }
 
     .def-block {

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Http\Resources\Product\Product as ProductResource;
 use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\UpdateRequest;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
 
@@ -58,7 +59,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->load('company');
 
-        return ProductResource::make($product);
+        return new ProductResource($product);
     }
 
     /**
@@ -68,9 +69,14 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->fill($request->validated());
+        dd($request);
+        $product->save();
+
+        return new ProductResource($product);
     }
 
     /**

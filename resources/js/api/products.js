@@ -20,3 +20,7 @@ export const loadProduct = async function (id) {
 export const storeProduct = async function (formdata, config) {
     return await axios.post('/api/products', formdata, config)
 }
+
+export const updateProduct = async function (formdata, config, id) {
+    return await axios.patch(`/api/products/${id}`, formdata, config)
+}

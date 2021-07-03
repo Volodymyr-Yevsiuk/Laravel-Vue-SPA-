@@ -32,6 +32,10 @@
                         class="form-input" 
                         @change="loadImage"
                     />
+                    <img   
+                        id="image" 
+                        :src="`/images/${form.image}`" 
+                    />
                 </div>
                 <div class="textarea-block">
                     <label for="description">Опис:</label>
