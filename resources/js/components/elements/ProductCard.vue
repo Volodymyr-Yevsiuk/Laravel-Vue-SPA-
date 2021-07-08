@@ -1,15 +1,15 @@
 <template>
-    <div class="card shadow-md" @click="$emit('view', product.id)">
+    <div class="card shadow-md" @click="$emit('view', product.id, $event.target)">
         <div class="card_container d-flex flex-col content-center items-center ">
             <img :src="`/images/${product.image}`" />
             <div class="name-block">
                 <p class="name">{{ product.name }}</p>
-                <router-link :to="{name: 'products.edit', params: { id: product.id} }">
-                    <i class="fas fa-edit"></i>
-                </router-link>
-                <router-link>
-                    <i class="fas fa-trash-alt"></i>
-                </router-link>
+                <div v-if="currentAuthorizedUser.company.id === product.company.id"> 
+                     <router-link  :to="{name: 'products.edit', params: { id: product.id} }">
+                        <i class="fas fa-edit"></i>
+                    </router-link>
+                    <i class="fas fa-trash-alt" @click="$emit('delete', product.id)"></i>
+                </div>
             </div>
             <div class="def-block">
                 <label for="price">Ціна: </label>
@@ -77,8 +77,15 @@ export default {
         color: rgb(11, 97, 131);
     }
 
-    .fas:last-child {
-        margin-left: 5px;
+    .fa-trash-alt {
+        margin-left: 10px;
+        color: rgb(170, 27, 27);
+        transition: .5s all;
+    }
+
+    .fa-trash-alt:hover {
+        font-size: 18px;
+        color: rgb(126, 22, 22);
     }
 
     .name {

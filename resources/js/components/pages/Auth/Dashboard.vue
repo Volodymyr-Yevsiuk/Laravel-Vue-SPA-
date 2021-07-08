@@ -15,8 +15,8 @@
                     <span id="role">{{ role.name }}</span>
                 </div>
                 <div class="content-block">
-                    <label for="role">Компанії, якими ви володієте:</label>
-                    <span id="role">{{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}</span>
+                    <label for="company">Компанії, якими ви володієте:</label>
+                    <span id="company">{{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}</span>
                     <vs-button v-if="user.company == null" @click="registerCompany">Зареєструвати свою компанію</vs-button>
                 </div>
                 <div class="content-block">
@@ -39,10 +39,19 @@
                     :key="product.id"
                     :product="product"
                     @view="show"
+                    @delete="showModal"
                 />
                 <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
             </div>
         </div>
+        <delete-modal
+            v-if="openModal"
+            title="Видалення продукту"
+            mainText="Ви дійсно хочете видалити цей продукт?"  
+            :deleteFunc="deleteProduct"  
+            :productId="productIdForDelete"
+            @cancel="cancelModal"
+        />
     </div>
 </template>
 
@@ -50,10 +59,13 @@
 import moment from 'moment'
 import ProductCard from '../../elements/ProductCard.vue'
 import {loadCompanyProducts} from '../../../api/companies'
+import DeleteModal from '../../elements/DeleteModal.vue'
+import {destroyProduct} from '../../../api/products'
 
 export default {
     components: {
-        ProductCard
+        ProductCard,
+        DeleteModal
     },
     data () {
         return {
@@ -62,7 +74,10 @@ export default {
             role: null,
             products: {},
             page: 1,
-            totalPages: 0
+            totalPages: 0,
+            openModal: false,
+            productIdForDelete: null
+            
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -71,7 +86,8 @@ export default {
                 vm.user = vm.currentAuthorizedUser
                 vm.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
                 vm.role = vm.currentAuthorizedUser.role
-                vm.user.created_at = moment(vm.user.created_at).calendar()
+                moment.locale('uk')
+                vm.user.created_at = moment(vm.user.created_at).format('L')
 
                 loadCompanyProducts(vm.user.company.id)
                 .then(response => {
@@ -85,9 +101,10 @@ export default {
         })
     },
     methods: {
-        registerCompany () {
+        registerCompany() {
             this.$router.push({name: 'companies.create'})
         },
+
         changePage(page = 1) {
             loadProducts (page)
                 .then((response) => {
@@ -98,12 +115,37 @@ export default {
                 .catch((err) => console.error(err))
         },
 
-        show(id) {
-            this.$router.push({name: 'products.show', params: { id: id }})
+        show(id, target) {
+            if (target && !(target.classList.contains('fa-edit') || target.classList.contains('fa-trash-alt'))) {
+                this.$router.push({name: 'products.show', params: { id: id }})
+            }
         },
 
         toCreate() {
             this.$router.push({name: 'products.create'})
+        },
+
+        showModal(id) {
+            this.productIdForDelete = id
+            this.openModal = true
+        },
+
+        cancelModal() {
+            this.productIdForDelete = null
+            this.openModal = false
+        },
+
+        async deleteProduct(id) {
+            await destroyProduct(id)
+                .then( response => {
+                    loadCompanyProducts(this.user.company.id)
+                        .then(response => {
+                            this.products = response.data.data
+                        })  
+                        .catch(err => console.error(err))
+                    console.log(`Продукт було ${id} видалено`)
+                })
+                .catch(err => console.error(err))
         }
 
     }

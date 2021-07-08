@@ -24,3 +24,7 @@ export const storeProduct = async function (formdata, config) {
 export const updateProduct = async function (formdata, config, id) {
     return await axios.patch(`/api/products/${id}`, formdata, config)
 }
+
+export const destroyProduct = async function (id) {
+    return await axios.delete(`/api/products/${id}`)
+}

@@ -2,6 +2,8 @@
     <div>
         <products-form 
             v-model="form"
+            :showImage="false"
+            textBtn="Створити"
             @submit="createProduct"
         />
     </div>

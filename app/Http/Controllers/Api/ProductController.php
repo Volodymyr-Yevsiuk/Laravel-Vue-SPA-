@@ -72,8 +72,24 @@ class ProductController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         $product = Product::findOrFail($id);
-        $product->fill($request->validated());
+
+        $data = $request->validated();
         dd($request);
+        if ($request->hasFile('image')) {
+            
+            $image = $request->file('image');
+
+            // resize uploaded image
+            if ($image->isValid()){
+                $image = Image::make($request->file('image'))->resize(270, 150);
+                $rndStr = Str::random(10);
+                $image->save(public_path().'/images/'.$rndStr.'.jpg');
+
+                $data['image'] = $rndStr.'.jpg';
+            }
+        }
+
+        $product->fill($data);
         $product->save();
 
         return new ProductResource($product);
@@ -87,6 +103,9 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return new ProductResource($product);
     }
 }

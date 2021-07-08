@@ -33,6 +33,7 @@
                         @change="loadImage"
                     />
                     <img   
+                        v-if="showImage && typeof(form.image) == 'string'"
                         id="image" 
                         :src="`/images/${form.image}`" 
                     />
@@ -41,7 +42,7 @@
                     <label for="description">Опис:</label>
                     <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть продукт"></textarea>
                 </div>
-                <vs-button type="submit" class="create-button">Створити</vs-button>
+                <vs-button type="submit" class="create-button">{{ textBtn }}</vs-button>
             </form>
         </div>
     </div>
@@ -52,6 +53,14 @@ export default {
     props: {
         value: {
             type: Object,
+            required: true
+        },
+        showImage: {
+            type: Boolean,
+            required: true
+        },
+        textBtn: {
+            type: String,
             required: true
         }
     },

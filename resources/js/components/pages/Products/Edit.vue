@@ -2,6 +2,8 @@
     <div>
         <products-form 
             v-model="form"
+            :showImage="true"
+            textBtn="Редагувати"
             @submit="editProduct"
         />
     </div>
@@ -21,7 +23,6 @@ export default {
                 price: 0,
                 description: '',
                 image: '',
-                company_id: ''
             },
             prevRoutePath: '',
             productId: ''
@@ -32,7 +33,6 @@ export default {
             vm.prevRoutePath = from.path
             if (vm.currentAuthorizedUser !== null) {
                 if (vm.currentAuthorizedUser.company !== null) {
-                    vm.form.company_id = vm.currentAuthorizedUser.company.id
                     vm.productId = to.params.id
 
                     loadProduct(to.params.id)
@@ -50,17 +50,11 @@ export default {
     },
     methods: {
         editProduct () {
-            const formData = new FormData();
             const config = { 'content-type': 'multipart/form-data' };
-            formData.set('name', this.form.name);
-            formData.set('price', this.form.price);
-            formData.set('description', this.form.description);
-            formData.set('image', this.form.image);
-            formData.set('_method', 'patch');
 
-            return updateProduct(formData, config, this.productId)
+            updateProduct(this.form, config, this.productId)
                 .then(() => {
-                    this.$router.push({ path: this.prevRoutePath });
+                    // console.log(formData)
                 })
                 .catch((err) => console.error(err))
         }
