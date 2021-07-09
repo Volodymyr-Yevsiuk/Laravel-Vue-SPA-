@@ -1,5 +1,5 @@
 <template>
-    <v-dialog/>
+    <v-dialog :clickToClose="false"/>
 </template>
 
 <script>
@@ -24,6 +24,11 @@ export default {
         }
     },
     methods: {
+        closeModal () {
+            this.$modal.hide('dialog')
+            this.$emit('cancel')
+        },
+
         show () {
             this.$modal.show('dialog', {
                 title: this.title,
@@ -39,9 +44,8 @@ export default {
                     },
                     {
                         title: 'Скасувати',
-                        handler: () => {
-                            this.$modal.hide('dialog')
-                            this.$emit('cancel')
+                        handler: () => { 
+                            this.closeModal()
                         }
                     },
                 ]
