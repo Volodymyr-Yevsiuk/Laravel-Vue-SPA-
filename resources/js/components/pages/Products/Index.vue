@@ -8,26 +8,40 @@
                     :key="product.id"
                     :product="product"
                     @view="show"
+                    @delete="showModal"
                 />
             </div>
         </div>
         <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
+        <delete-modal
+            v-if="openModal"
+            title="Видалення продукту"
+            mainText="Ви дійсно хочете видалити цей продукт?"  
+            :deleteFunc="deleteProduct"  
+            :productId="productIdForDelete"
+            @cancel="cancelModal"
+        />
     </div>  
 </template>
 
 <script>
 import ProductCard from '../../elements/ProductCard.vue'
 import {loadProducts} from '../../../api/products'
+import DeleteModal from '../../elements/DeleteModal.vue'
+import {destroyProduct} from '../../../api/products'
 
 export default {
     components: {
-        ProductCard
+        ProductCard,
+        DeleteModal
     },
     data () {
         return {
             products: {},
             page: 1,
-            totalPages: 0
+            totalPages: 0,
+            openModal: false,
+            productIdForDelete: null
         }
     },
     async beforeRouteEnter(to, from, next) {
@@ -62,12 +76,37 @@ export default {
                 .catch((err) => console.error(err))
         },
 
-        show(id) {
-            this.$router.push({name: 'products.show', params: { id: id }})
+        show(id, target) {
+            if (target && !(target.classList.contains('fa-edit') || target.classList.contains('fa-trash-alt'))) {
+                this.$router.push({name: 'products.show', params: { id: id }})
+            }        
         },
 
         toCreate() {
             this.$router.push({name: 'products.create'})
+        },
+
+        showModal(id) {
+            this.productIdForDelete = id
+            this.openModal = true
+        },
+
+        cancelModal() {
+            this.productIdForDelete = null
+            this.openModal = false
+        },
+
+        async deleteProduct(id) {
+            await destroyProduct(id)
+                .then( response => {
+                    loadProducts()
+                        .then(response => {
+                            this.products = response.data.data
+                        })  
+                        .catch(err => console.error(err))
+                    console.log(`Продукт було ${id} видалено`)
+                })
+                .catch(err => console.error(err))
         }
     }
 }

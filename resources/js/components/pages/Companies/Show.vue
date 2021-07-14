@@ -8,7 +8,7 @@
             </div>
             <div class="d-flex company-block">
                 <label for="user">Засновник:</label>
-                <router-link :to="{name: 'users.show', params: {id: user.id}}" id="user">{{user.name}}</router-link>
+                <span id="user">{{user.name}}</span>
             </div>
             <div class="d-flex company-block">
                 <label for="price">К-сть співробіників:</label>
@@ -77,17 +77,6 @@ export default {
 
     label {
         font-weight: 600;
-    }
-
-    #user {
-        color: rgb(0, 158, 179);
-        text-decoration: none;
-        transition: all 1s;
-    }
-
-    #user:hover {
-        color: rgb(1, 92, 104);
-        text-decoration: underline;
     }
 
     .company-block {

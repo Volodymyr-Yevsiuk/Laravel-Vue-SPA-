@@ -74,7 +74,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $data = $request->validated();
-        dd($request);
+        
         if ($request->hasFile('image')) {
             
             $image = $request->file('image');

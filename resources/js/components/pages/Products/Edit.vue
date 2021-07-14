@@ -49,12 +49,19 @@ export default {
         })
     },
     methods: {
-        editProduct () {
+        editProduct (form) {
+            let formData = new FormData();
             const config = { 'content-type': 'multipart/form-data' };
-
-            updateProduct(this.form, config, this.productId)
+            formData.set('name', this.form.name);
+            formData.set('price', this.form.price);
+            formData.set('description', this.form.description);
+            formData.set('image', this.form.image);
+            formData.append('_method', 'PATCH')
+            console.log(formData)
+            
+            updateProduct(formData, config, this.productId)
                 .then(() => {
-                    // console.log(formData)
+                    this.$router.push({name: 'dashboard'})
                 })
                 .catch((err) => console.error(err))
         }

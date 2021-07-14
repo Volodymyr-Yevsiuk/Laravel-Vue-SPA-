@@ -24,7 +24,7 @@ export default {
                 image: '',
                 company_id: ''
             },
-            prevRoutePath: ''
+            prevRoutePath: '',
         }
     },
     beforeRouteEnter (to, from, next) {
@@ -53,7 +53,7 @@ export default {
             formData.append('image', this.form.image);
             formData.append('company_id', this.form.company_id);
             
-            return storeProduct(formData, config)
+            storeProduct(formData, config)
                 .then(() => {
                     this.$router.push({ path: this.prevRoutePath });
                 })

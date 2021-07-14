@@ -77,7 +77,6 @@ export default {
             totalPages: 0,
             openModal: false,
             productIdForDelete: null
-            
         }
     },
     async beforeRouteEnter (to, from, next) {

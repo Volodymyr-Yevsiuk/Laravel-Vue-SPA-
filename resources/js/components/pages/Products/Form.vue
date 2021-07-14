@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container mx-auto">
-            <form method="POST" @submit.prevent="$emit('submit')" >
+            <form method="POST" enctype="multipart/form-data" ref="form" @submit.prevent="$emit('submit', $refs.form)">
                 <div class="form-block">
                     <label for="name">Назва:</label>
                     <vs-input 
@@ -62,7 +62,7 @@ export default {
         textBtn: {
             type: String,
             required: true
-        }
+        },
     },
     computed: {
         form: {

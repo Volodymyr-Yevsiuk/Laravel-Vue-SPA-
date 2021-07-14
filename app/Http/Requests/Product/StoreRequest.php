@@ -25,6 +25,7 @@ class StoreRequest extends UpdateRequest
     {
         $rules = parent::rules();
 
+        $rules['image'] = ['image'];
         $rules['company_id'] = ['required', 'exists:App\Models\Company,id'];
         
         return $rules;
