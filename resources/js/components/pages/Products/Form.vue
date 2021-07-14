@@ -23,6 +23,27 @@
                         class="form-input" 
                         placeholder="Введіть ціну продукта"/>
                 </div>
+                <div class="form-block">
+                    <label for="companies">Компанія:</label>
+                    <vs-select 
+                        v-if="Object.keys(currentAuthorizedUser.company).length > 1"
+                        type="text" 
+                        name="company_id" 
+                        id="companies" 
+                        v-model="form.company_id" 
+                        class="form-input" 
+                        placeholder="Виберіть компанію"
+                    >
+                        <vs-option 
+                            v-for="company in currentAuthorizedUser.company"
+                            :key="company.id"
+                            :label="company.name"
+                            :value="company.id"
+                        >
+                            {{ company.name }}
+                        </vs-option>
+                    </vs-select>
+                </div>
                  <div class="form-block">
                     <label for="image">Зображення:</label>
                     <vs-input 

@@ -23,7 +23,7 @@ class User extends JsonResource
             'password' => $this->resource->password,
             'profile_photo_path' => $this->resource->profile_photo_path,
             'role' => Role::where('id', $this->resource->role_id)->first(),
-            'company' => Company::where('user_id', $this->resource->id)->first(),
+            'company' => Company::where('user_id', $this->resource->id)->get(),
             'created_at' => $this->resource->created_at,
             'updated_at' => $this->resource->updated_at
         ];

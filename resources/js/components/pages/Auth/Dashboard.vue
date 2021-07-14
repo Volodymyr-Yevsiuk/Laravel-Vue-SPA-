@@ -16,7 +16,20 @@
                 </div>
                 <div class="content-block">
                     <label for="company">Компанії, якими ви володієте:</label>
-                    <span id="company">{{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}</span>
+                    <span 
+                        v-if="Object.keys(user.company).length <= 1" 
+                        id="company"
+                    >
+                        {{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}
+                    </span>
+                    <span 
+                        v-else
+                        v-for="company in user.company" 
+                        :key="company.id"
+                        id="company"  
+                    >
+                        <router-link :to="{name: 'companies.show', params: { id: company.id }}" class="company-link">{{ company.name }}</router-link>,
+                    </span>
                     <vs-button v-if="user.company == null" @click="registerCompany">Зареєструвати свою компанію</vs-button>
                 </div>
                 <div class="content-block">
@@ -196,5 +209,15 @@ export default {
     .logout {
         font-size: 16px;
         padding: 5px;
+    }
+
+    .company-link {
+        color: rgb(24, 98, 168);
+        transition: .5s all;
+    }
+
+    .company-link:hover {
+        color: rgb(21, 80, 134);
+        text-decoration: underline;
     }
 </style>

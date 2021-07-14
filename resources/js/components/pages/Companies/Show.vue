@@ -7,12 +7,16 @@
                 <span id="name">{{company.name}}</span>
             </div>
             <div class="d-flex company-block">
-                <label for="user">Засновник:</label>
-                <span id="user">{{user.name}}</span>
+                <label for="address">Адреса:</label>
+                <span id="address">{{company.address}}</span>
             </div>
             <div class="d-flex company-block">
                 <label for="price">К-сть співробіників:</label>
                 <span id="price">Понад {{company.employees}} працівників</span>
+            </div>
+            <div class="d-flex company-block">
+                <label for="user">Засновник:</label>
+                <span id="user">{{user.name}}</span>
             </div>
             <div class="d-flex company-block">
                 <label for="description">Опис:</label>

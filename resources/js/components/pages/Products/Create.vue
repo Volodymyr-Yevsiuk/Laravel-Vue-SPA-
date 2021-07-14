@@ -30,9 +30,14 @@ export default {
     beforeRouteEnter (to, from, next) {
         next((vm) => {
             vm.prevRoutePath = from.path
+            
             if (vm.currentAuthorizedUser !== null) {
                 if (vm.currentAuthorizedUser.company !== null) {
-                    vm.form.company_id = vm.currentAuthorizedUser.company.id
+                    if (Object.keys(vm.currentAuthorizedUser.company).length <= 1) {
+                        vm.form.company_id = vm.currentAuthorizedUser.company.id
+                    } else {
+                        vm.form.company_id = ''
+                    }
                 } else {
                     vm.$router.push({name: 'companies.create'})
                     console.log('Спочатку зареєструйте компанію')
