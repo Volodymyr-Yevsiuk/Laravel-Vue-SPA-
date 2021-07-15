@@ -16,11 +16,5 @@ class CompanySeeder extends Seeder
     public function run()
     {
         Company::factory()->count(15)->create();
-
-        $companies = Company::all();
-        foreach ($companies as $key => $company) {
-            $user = $company->user;
-            $user->update(['role_id' => 2]);
-        }
     }
 }

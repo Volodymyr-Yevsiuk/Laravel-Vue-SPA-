@@ -3,6 +3,7 @@
         <products-form 
             v-model="form"
             :showImage="true"
+            :showCompanies="false"
             textBtn="Редагувати"
             @submit="editProduct"
         />

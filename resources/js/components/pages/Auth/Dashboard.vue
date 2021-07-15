@@ -98,6 +98,8 @@ export default {
                 vm.user = vm.currentAuthorizedUser
                 vm.photo = 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?f=y&s=100'
                 vm.role = vm.currentAuthorizedUser.role
+
+                // datetime
                 moment.locale('uk')
                 vm.user.created_at = moment(vm.user.created_at).format('L')
 
@@ -109,6 +111,7 @@ export default {
                     }
                 }
 
+                // load users products
                 loadCompanyProducts(vm.user.id)
                 .then(response => {
                     response.data.data.forEach(company => {
@@ -165,7 +168,13 @@ export default {
                 .then( response => {
                     loadCompanyProducts(this.user.id)
                         .then(response => {
-                            this.products = response.data.data
+                            this.products = []
+                            response.data.data.forEach(company => {
+                                company.products.forEach(product => {
+                                    product['company'] = company.name
+                                    this.products.push(product)
+                                })
+                            })
                         })  
                         .catch(err => console.error(err))
                     console.log(`Продукт було ${id} видалено`)

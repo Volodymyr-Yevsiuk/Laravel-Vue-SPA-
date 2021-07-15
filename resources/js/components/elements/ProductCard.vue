@@ -4,7 +4,7 @@
             <img :src="`/images/${product.image}`" />
             <div class="name-block">
                 <p class="name">{{ product.name }}</p>
-                <div v-if="(currentAuthorizedUser.company.id === product.company.id) || isUserCompanyProduct"> 
+                <div v-if="(currentAuthorizedUser.company.id === product.company.id) || (isUserCompanyProduct === true)"> 
                      <router-link  :to="{name: 'products.edit', params: { id: product.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
@@ -45,18 +45,14 @@ export default {
         if (Object.keys(this.currentAuthorizedUser.company).length > 1) {
             for (let i in this.currentAuthorizedUser.company) {
                 this.companiesIds.push(this.currentAuthorizedUser.company[i].id)
-                // if (this.product.company_id != null) {
-                //     console.log(1)
-                //     this.isUserCompanyProduct = this.product.company_id === this.currentAuthorizedUser.company[i].id ? true : false
-                // } else {
-                //     console.log(2)
-                //     this.isUserCompanyProduct = this.product.company.id === this.currentAuthorizedUser.company[i].id ? true : false
-                // }
-                
-                // console.log(this.currentAuthorizedUser.company[i].id)
+            }
+
+            if (this.product.company.id != null) {
+                this.isUserCompanyProduct = this.companiesIds.includes(this.product.company.id) ? true : false
+            } else {
+                this.isUserCompanyProduct = this.companiesIds.includes(this.product.company_id) ? true : false
             }
         }
-        
     }
 }
 </script>

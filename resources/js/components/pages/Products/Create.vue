@@ -3,6 +3,7 @@
         <products-form 
             v-model="form"
             :showImage="false"
+            :showCompanies="true"
             textBtn="Створити"
             @submit="createProduct"
         />

@@ -23,7 +23,7 @@
                         class="form-input" 
                         placeholder="Введіть ціну продукта"/>
                 </div>
-                <div class="form-block" v-if="Object.keys(currentAuthorizedUser.company).length > 1">
+                <div class="form-block" v-if="(Object.keys(currentAuthorizedUser.company).length > 1) && showCompanies">
                     <label for="companies">Компанія:</label>
                     <vs-select 
                         type="text" 
@@ -83,6 +83,10 @@ export default {
             type: String,
             required: true
         },
+        showCompanies: {
+            type: Boolean,
+            required: true
+        }
     },
     computed: {
         form: {
