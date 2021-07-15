@@ -2,7 +2,15 @@
     <div class="card shadow-md" @click="$emit('view', company.id)">
         <div class="card_container d-flex flex-col content-center items-center ">
             <img :src="`/images/${company.image}`" class="mx-auto" />
-            <p class="name">{{ company.name }}</p>
+            <div class="name-block">
+                <p class="name">{{ company.name }}</p>
+                <div> 
+                    <router-link  :to="{name: 'companies.edit', params: { id: company.id} }">
+                        <i class="fas fa-edit"></i>
+                    </router-link>
+                    <i class="fas fa-trash-alt" @click="$emit('delete', company.id)"></i>
+                </div>
+            </div>
             <div class="def-block">
                 <label for="employees">К-сть співробітників: </label>
                 <span id="employees" class="sp">Понад {{company.employees}} працівників</span>
@@ -56,7 +64,7 @@ export default {
         text-align: center;
         font-size: 18px;
         font-weight: 600;
-        border-bottom: .5px solid rgb(126, 124, 124);
+        /* border-bottom: .5px solid rgb(126, 124, 124); */
     }
 
     .def-block {
@@ -76,6 +84,35 @@ export default {
 
     .sp {
         margin-left: 5px;
+    }
+
+    .name-block {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        border-bottom: .5px solid rgb(126, 124, 124);
+    }
+
+    .fa-edit {
+        margin-left: 15px;
+        color: rgb(15, 144, 196);
+        transition: .5s all;
+    }
+
+    .fa-edit:hover {
+        font-size: 18px;
+        color: rgb(11, 97, 131);
+    }
+
+    .fa-trash-alt {
+        margin-left: 10px;
+        color: rgb(170, 27, 27);
+        transition: .5s all;
+    }
+
+    .fa-trash-alt:hover {
+        font-size: 18px;
+        color: rgb(126, 22, 22);
     }
 
 </style>

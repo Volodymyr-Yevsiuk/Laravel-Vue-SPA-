@@ -4,6 +4,7 @@ namespace App\Http\Resources\Company;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\User\User as UserResource;
+use App\Http\Resources\Product\Product as ProductResource;
 
 class Company extends JsonResource
 {
@@ -22,7 +23,8 @@ class Company extends JsonResource
             'description' => $this->resource->description,
             'address' => $this->resource->address,
             'employees' => $this->resource->employees,
-            'user' => UserResource::make($this->whenLoaded('user'))
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'products' => $this->resource->products
         ];
     }
 }

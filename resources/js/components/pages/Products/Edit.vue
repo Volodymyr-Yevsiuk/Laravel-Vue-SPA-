@@ -57,7 +57,6 @@ export default {
             formData.set('description', this.form.description);
             formData.set('image', this.form.image);
             formData.append('_method', 'PATCH')
-            console.log(formData)
             
             updateProduct(formData, config, this.productId)
                 .then(() => {

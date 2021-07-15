@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container mx-auto">
-            <form method="POST" enctype="multipart/form-data" ref="form" @submit.prevent="$emit('submit', $refs.form)">
+            <form method="POST" enctype="multipart/form-data" @submit.prevent="$emit('submit')">
                 <div class="form-block">
                     <label for="name">Назва:</label>
                     <vs-input 
@@ -23,10 +23,9 @@
                         class="form-input" 
                         placeholder="Введіть ціну продукта"/>
                 </div>
-                <div class="form-block">
+                <div class="form-block" v-if="Object.keys(currentAuthorizedUser.company).length > 1">
                     <label for="companies">Компанія:</label>
                     <vs-select 
-                        v-if="Object.keys(currentAuthorizedUser.company).length > 1"
                         type="text" 
                         name="company_id" 
                         id="companies" 

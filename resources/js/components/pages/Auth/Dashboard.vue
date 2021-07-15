@@ -85,7 +85,7 @@ export default {
             user: null,
             photo: null,
             role: null,
-            products: {},
+            products: [],
             page: 1,
             totalPages: 0,
             openModal: false,
@@ -101,9 +101,22 @@ export default {
                 moment.locale('uk')
                 vm.user.created_at = moment(vm.user.created_at).format('L')
 
-                loadCompanyProducts(vm.user.company.id)
+                let companyIds = vm.user.company.id;
+                if (Object.keys(vm.user.company).length > 1) {
+                    companyIds = []
+                    for (let i in vm.user.company) {
+                        companyIds.push(vm.user.company[i].id)
+                    }
+                }
+
+                loadCompanyProducts(vm.user.id)
                 .then(response => {
-                    vm.products = response.data.data
+                    response.data.data.forEach(company => {
+                        company.products.forEach(product => {
+                            product['company'] = company.name
+                            vm.products.push(product)
+                        })
+                    })
                 })  
                 .catch(err => console.error(err))
             } else {
@@ -150,7 +163,7 @@ export default {
         async deleteProduct(id) {
             await destroyProduct(id)
                 .then( response => {
-                    loadCompanyProducts(this.user.company.id)
+                    loadCompanyProducts(this.user.id)
                         .then(response => {
                             this.products = response.data.data
                         })  

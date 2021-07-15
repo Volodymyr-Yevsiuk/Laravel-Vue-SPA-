@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Company;
+use App\Models\User;
 use App\Http\Resources\Company\Company as CompanyResource;
 use App\Http\Resources\Product\Product as ProductResource;
 use App\Http\Requests\Company\StoreRequest;
+use App\Http\Requests\Company\UpdateRequest;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
 
@@ -69,9 +71,30 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        //
+        $company = Company::findOrFail($id);
+
+        $data = $request->validated();
+        
+        if ($request->hasFile('image')) {
+            
+            $image = $request->file('image');
+
+            // resize uploaded image
+            if ($image->isValid()){
+                $image = Image::make($request->file('image'))->resize(270, 150);
+                $rndStr = Str::random(10);
+                $image->save(public_path().'/images/'.$rndStr.'.jpg');
+
+                $data['image'] = $rndStr.'.jpg';
+            }
+        }
+
+        $company->fill($data);
+        $company->save();
+
+        return new CompanyResource($company);
     }
 
     /**
@@ -82,15 +105,21 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $company = Company::findOrFail($id);
+        $company->delete();
+
+        return new CompanyResource($company);
     }
 
     public function getCompanyProducts ($id) {
-        $company = Company::findOrFail($id);
 
-        $products = $company->products;
-        $products->load('company');
-        
-        return ProductResource::collection($products);
+        $user = User::findOrFail($id);
+        $companies = $user->companies;
+
+        // foreach ($companies as $company) {
+        //     dump($company->products()->paginate(10));
+        // }
+
+        return CompanyResource::collection($companies);
     }
 }

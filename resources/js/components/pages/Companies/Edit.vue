@@ -2,15 +2,16 @@
     <div>
         <companies-form 
             v-model="form"
-            :showImage="false"
-            @submit="createCompany"
+            :showImage="true"
+            @submit="editCompany"
         />
     </div>
 </template>
 
 <script>
 import CompaniesForm from './Form.vue'
-import { storeCompany } from '../../../api/companies'
+import { loadCompany } from '../../../api/companies'
+import { updateCompany } from '../../../api/companies'
 
 export default {
     components: {CompaniesForm},
@@ -24,7 +25,8 @@ export default {
                 address: '',
                 user_id: ''
             },
-            prevRoutePath: ''
+            prevRoutePath: '',
+            companyId: ''
         }
     },
     beforeRouteEnter (to, from, next) {
@@ -32,6 +34,11 @@ export default {
             vm.prevRoutePath = from.path
             if (vm.currentAuthorizedUser !== null) {
                 vm.form.user_id = vm.currentAuthorizedUser.id
+                vm.companyId = to.params.id
+
+                loadCompany(to.params.id)
+                    .then(response => vm.form = response.data.data)
+                    .catch(err => console.error(err))
             } else {
                 window.location.href = '/login'
                 console.log('Авторизуйтесь будь ласка')
@@ -39,17 +46,17 @@ export default {
         })
     },
     methods: {
-        createCompany () {
+        editCompany () {
             const formData = new FormData();
             const config = { 'content-type': 'multipart/form-data' };
-            formData.append('name', this.form.name);
-            formData.append('employees', this.form.employees);
-            formData.append('description', this.form.description);
-            formData.append('image', this.form.image);
-            formData.append('address', this.form.address);
-            formData.append('user_id', this.form.user_id);
+            formData.set('name', this.form.name);
+            formData.set('employees', this.form.employees);
+            formData.set('description', this.form.description);
+            formData.set('image', this.form.image);
+            formData.set('address', this.form.address);
+            formData.append('_method', 'PATCH')
             
-            storeCompany(formData, config)
+            updateCompany(formData, config, this.companyId)
             .then(() => {
                 this.$router.push(this.prevRoutePath);
             })
