@@ -17,20 +17,20 @@
                 <div class="content-block">
                     <label for="company">Компанії, якими ви володієте:</label>
                     <span 
-                        v-if="Object.keys(user.company).length <= 1" 
+                        v-if="(Object.keys(user.company).length <= 1)" 
                         id="company"
                     >
-                        {{ user.company ? user.company.name : 'Ви не володієте жодними компаніями.' }}
+                        {{ Object.keys(user.company).length == 1 ? user.company[0].name : 'Ви не володієте жодними компаніями.' }}
                     </span>
                     <span 
-                        v-else
+                        v-else 
                         v-for="company in user.company" 
                         :key="company.id"
                         id="company"  
                     >
                         <router-link :to="{name: 'companies.show', params: { id: company.id }}" class="company-link">{{ company.name }}</router-link>,
                     </span>
-                    <vs-button v-if="user.company == null" @click="registerCompany">Зареєструвати свою компанію</vs-button>
+                    <vs-button v-if="Object.keys(user.company).length < 1" @click="registerCompany">Зареєструвати свою компанію</vs-button>
                 </div>
                 <div class="content-block">
                     <label for="created_at">Дата створення акаунта:</label>
@@ -62,7 +62,7 @@
             title="Видалення продукту"
             mainText="Ви дійсно хочете видалити цей продукт?"  
             :deleteFunc="deleteProduct"  
-            :productId="productIdForDelete"
+            :id="productIdForDelete"
             @cancel="cancelModal"
         />
     </div>

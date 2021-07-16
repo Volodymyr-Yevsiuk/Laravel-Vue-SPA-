@@ -4,7 +4,7 @@
             <img :src="`/images/${company.image}`" class="mx-auto" />
             <div class="name-block">
                 <p class="name">{{ company.name }}</p>
-                <div> 
+                <div v-if="isUserCompany === true"> 
                     <router-link  :to="{name: 'companies.edit', params: { id: company.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
@@ -28,13 +28,22 @@
 
 <script>
 export default {
-    name: 'ProductCard',
+    name: 'CompanyCard',
     props: {
         company: {
             type: Object,
             required: true
         },
     },
+    data () {
+        return {
+            usersIds: [],
+            isUserCompany: null
+        }
+    },
+    mounted () {
+        this.isUserCompany = this.company.user.id === this.currentAuthorizedUser.id ? true : false
+    }
 }
 </script>
 

@@ -24,12 +24,21 @@ export default {
                 address: '',
                 user_id: ''
             },
-            prevRoutePath: ''
+            prevRoutePath: '',
+            showAlert: false
+        }
+    },
+    mounted () {
+        if (this.showAlert) {
+            alert('Спочатку зареєструйте компанію!')
+            this.showAlert = false
         }
     },
     beforeRouteEnter (to, from, next) {
+        
         next((vm) => {
             vm.prevRoutePath = from.path
+            vm.showAlert = from.name === 'products.create' ? true : false
             if (vm.currentAuthorizedUser !== null) {
                 vm.form.user_id = vm.currentAuthorizedUser.id
             } else {
@@ -55,7 +64,12 @@ export default {
             })
             .catch((err) => console.error(err))
         }
-    }
+    },
+    events: {
+        showAlert: function (bool) {
+            return bool
+        },
+    },
 }
 </script>
 

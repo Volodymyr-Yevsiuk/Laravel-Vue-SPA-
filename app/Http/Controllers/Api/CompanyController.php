@@ -116,10 +116,6 @@ class CompanyController extends Controller
         $user = User::findOrFail($id);
         $companies = $user->companies;
 
-        // foreach ($companies as $company) {
-        //     dump($company->products()->paginate(10));
-        // }
-
         return CompanyResource::collection($companies);
     }
 }

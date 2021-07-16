@@ -33,9 +33,9 @@ export default {
             vm.prevRoutePath = from.path
             
             if (vm.currentAuthorizedUser !== null) {
-                if (vm.currentAuthorizedUser.company !== null) {
-                    if (Object.keys(vm.currentAuthorizedUser.company).length <= 1) {
-                        vm.form.company_id = vm.currentAuthorizedUser.company.id
+                if (Object.keys(vm.currentAuthorizedUser.company).length > 0) {
+                    if (Object.keys(vm.currentAuthorizedUser.company).length === 1) {
+                        vm.form.company_id = vm.currentAuthorizedUser.company.id || vm.currentAuthorizedUser.company[0].id 
                     } else {
                         vm.form.company_id = ''
                     }

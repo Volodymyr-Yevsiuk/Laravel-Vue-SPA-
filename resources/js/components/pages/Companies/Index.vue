@@ -7,27 +7,42 @@
                     v-for="company in companies" 
                     :key="company.id"
                     :company="company"
+                    @delete="showModal"
                     @view="show"
                 />
             </div>
         </div>
         <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
+        <delete-modal
+            v-if="openModal"
+            title="Видалення компанії"
+            mainText="Ви дійсно хочете видалити компанію?"  
+            :deleteFunc="deleteCompany"  
+            :id="companyIdForDelete"
+            @cancel="cancelModal"
+        />
     </div>  
 </template>
 
 <script>
 import CompanyCard from '../../elements/CompanyCard.vue'
+import DeleteModal from '../../elements/DeleteModal.vue'
 import {loadCompanies} from '../../../api/companies'
+import {destroyCompany} from '../../../api/companies'
+
 
 export default {
     components: {
-        CompanyCard
+        CompanyCard,
+        DeleteModal
     },
     data () {
         return {
             companies: {},
             page: 1,
-            totalPages: 0
+            totalPages: 0,
+            companyIdForDelete: null,
+            openModal: false
         }
     },
     async beforeRouteEnter(to, from, next) {
@@ -62,12 +77,37 @@ export default {
                 .catch((err) => console.error(err))
         },
 
-        show(id) {
-            this.$router.push({name: 'companies.show', params: { id: id }})
+        show(id, target) {
+            if (target && !(target.classList.contains('fa-edit') || target.classList.contains('fa-trash-alt'))) {
+                this.$router.push({name: 'products.show', params: { id: id }})
+            }        
         },
 
         toCreate() {
             this.$router.push({name: 'companies.create'})
+        },
+
+         showModal(id) {
+            this.companyIdForDelete = id
+            this.openModal = true
+        },
+
+        cancelModal() {
+            this.companyIdForDelete = null
+            this.openModal = false
+        },
+
+        async deleteCompany(id) {
+            await destroyCompany(id)
+                .then( response => {
+                    loadCompanies()
+                        .then(response => {
+                            this.companies = response.data.data
+                        })  
+                        .catch(err => console.error(err))
+                    console.log(`Компанію з id ${id} видалено`)
+                })
+                .catch(err => console.error(err))
         }
     }
 }

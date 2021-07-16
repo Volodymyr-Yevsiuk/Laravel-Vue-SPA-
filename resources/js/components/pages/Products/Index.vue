@@ -18,7 +18,7 @@
             title="Видалення продукту"
             mainText="Ви дійсно хочете видалити цей продукт?"  
             :deleteFunc="deleteProduct"  
-            :productId="productIdForDelete"
+            :id="productIdForDelete"
             @cancel="cancelModal"
         />
     </div>  

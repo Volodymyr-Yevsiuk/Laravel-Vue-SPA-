@@ -18,7 +18,7 @@ export default {
             type: Function,
             required: true
         },
-        productId: {
+        id: {
             type: String,
             required: true
         }
@@ -37,7 +37,7 @@ export default {
                     {   
                         title: 'Так',
                         handler: () => {
-                            this.deleteFunc(this.productId)
+                            this.deleteFunc(this.id)
                             this.$modal.hide('dialog')
                             this.$emit('cancel')
                         }
