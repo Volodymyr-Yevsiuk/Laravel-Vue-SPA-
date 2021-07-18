@@ -29,6 +29,7 @@ import CompanyCard from '../../elements/CompanyCard.vue'
 import DeleteModal from '../../elements/DeleteModal.vue'
 import {loadCompanies} from '../../../api/companies'
 import {destroyCompany} from '../../../api/companies'
+import store from '../../../store/index'
 
 
 export default {
@@ -79,7 +80,7 @@ export default {
 
         show(id, target) {
             if (target && !(target.classList.contains('fa-edit') || target.classList.contains('fa-trash-alt'))) {
-                this.$router.push({name: 'products.show', params: { id: id }})
+                this.$router.push({name: 'companies.show', params: { id: id }})
             }        
         },
 
@@ -100,6 +101,7 @@ export default {
         async deleteCompany(id) {
             await destroyCompany(id)
                 .then( response => {
+                    store.commit('deleteAuthUserCompany', response.data.data)
                     loadCompanies()
                         .then(response => {
                             this.companies = response.data.data

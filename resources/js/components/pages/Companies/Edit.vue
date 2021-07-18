@@ -12,6 +12,7 @@
 import CompaniesForm from './Form.vue'
 import { loadCompany } from '../../../api/companies'
 import { updateCompany } from '../../../api/companies'
+import store from '../../../store/index'
 
 export default {
     components: {CompaniesForm},
@@ -57,8 +58,9 @@ export default {
             formData.append('_method', 'PATCH')
             
             updateCompany(formData, config, this.companyId)
-            .then(() => {
+            .then((response) => {
                 this.$router.push(this.prevRoutePath);
+                store.commit('updateAuthUserCompany', response.data.data)
             })
             .catch((err) => console.error(err))
         }

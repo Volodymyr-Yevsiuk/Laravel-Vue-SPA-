@@ -11,6 +11,7 @@
 <script>
 import CompaniesForm from './Form.vue'
 import { storeCompany } from '../../../api/companies'
+import store from '../../../store/index'
 
 export default {
     components: {CompaniesForm},
@@ -59,16 +60,13 @@ export default {
             formData.append('user_id', this.form.user_id);
             
             storeCompany(formData, config)
-            .then(() => {
+            .then((response) => {
                 this.$router.push(this.prevRoutePath);
+                store.commit('createAuthUserCompany', response.data.data)
+                
             })
             .catch((err) => console.error(err))
         }
-    },
-    events: {
-        showAlert: function (bool) {
-            return bool
-        },
     },
 }
 </script>

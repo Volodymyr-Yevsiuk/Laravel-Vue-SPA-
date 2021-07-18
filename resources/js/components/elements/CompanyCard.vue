@@ -1,5 +1,5 @@
 <template>
-    <div class="card shadow-md" @click="$emit('view', company.id)">
+    <div class="card shadow-md" @click="$emit('view', company.id, $event.target)">
         <div class="card_container d-flex flex-col content-center items-center ">
             <img :src="`/images/${company.image}`" class="mx-auto" />
             <div class="name-block">

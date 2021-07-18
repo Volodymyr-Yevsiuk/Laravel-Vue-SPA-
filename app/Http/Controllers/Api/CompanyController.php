@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\User;
 use App\Http\Resources\Company\Company as CompanyResource;
-use App\Http\Resources\Product\Product as ProductResource;
+use App\Http\Resources\Company\UpdateCompanyResource;
 use App\Http\Requests\Company\StoreRequest;
 use App\Http\Requests\Company\UpdateRequest;
 use Intervention\Image\Facades\Image;
@@ -94,7 +94,7 @@ class CompanyController extends Controller
         $company->fill($data);
         $company->save();
 
-        return new CompanyResource($company);
+        return new UpdateCompanyResource($company);
     }
 
     /**
