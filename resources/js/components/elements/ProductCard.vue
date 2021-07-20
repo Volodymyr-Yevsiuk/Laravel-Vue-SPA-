@@ -4,7 +4,7 @@
             <img :src="`/images/${product.image}`" />
             <div class="name-block">
                 <p class="name">{{ product.name }}</p>
-                <div v-if="(currentAuthorizedUser.company.id === product.company.id) || (isUserCompanyProduct === true)"> 
+                <div v-if="showEditDestroyIcons()"> 
                      <router-link  :to="{name: 'products.edit', params: { id: product.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
@@ -42,16 +42,25 @@ export default {
         }
     },
     mounted () {
-        if (Object.keys(this.currentAuthorizedUser.company).length > 1) {
-            for (let i in this.currentAuthorizedUser.company) {
-                this.companiesIds.push(this.currentAuthorizedUser.company[i].id)
-            }
+        if (this.currentAuthorizedUser !== null) {
+            if (this.currentAuthorizedUser.company !== null) {
+                if (Object.keys(this.currentAuthorizedUser.company).length > 1) {
+                    for (let i in this.currentAuthorizedUser.company) {
+                        this.companiesIds.push(this.currentAuthorizedUser.company[i].id)
+                    }
 
-            if (this.product.company.id != null) {
-                this.isUserCompanyProduct = this.companiesIds.includes(this.product.company.id) ? true : false
-            } else {
-                this.isUserCompanyProduct = this.companiesIds.includes(this.product.company_id) ? true : false
+                    if (this.product.company.id != null) {
+                        this.isUserCompanyProduct = this.companiesIds.includes(this.product.company.id) ? true : false
+                    } else {
+                        this.isUserCompanyProduct = this.companiesIds.includes(this.product.company_id) ? true : false
+                    }
+                }
             }
+        }
+    },
+    methods: {
+        showEditDestroyIcons () {
+            return this.currentAuthorizedUser != null && this.currentAuthorizedUser.company != null && ((this.currentAuthorizedUser.company.id === this.product.company.id) || (this.isUserCompanyProduct === true))
         }
     }
 }

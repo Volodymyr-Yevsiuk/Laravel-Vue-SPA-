@@ -42,7 +42,10 @@ export default {
         }
     },
     mounted () {
-        this.isUserCompany = this.company.user.id === this.currentAuthorizedUser.id ? true : false
+        if (this.currentAuthorizedUser !== null) {
+            this.isUserCompany = this.company.user.id === this.currentAuthorizedUser.id ? true : false
+        }
+        
     }
 }
 </script>

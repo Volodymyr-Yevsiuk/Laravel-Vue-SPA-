@@ -17,11 +17,18 @@
                 <div class="content-block">
                     <label for="company">Компанії, якими ви володієте:</label>
                     <span 
-                        v-if="(Object.keys(user.company).length <= 1)" 
+                        v-if="(Object.keys(user.company).length <= 0)" 
                         id="company"
                     >
-                        {{ Object.keys(user.company).length == 1 ? user.company[0].name : 'Ви не володієте жодними компаніями.' }}
+                        Ви не володієте жодними компаніями.
                     </span>
+                    <router-link 
+                        v-if="(Object.keys(user.company).length === 1)"
+                        :to="{name: 'companies.show', params: { id: user.company[Object.keys(user.company)[0]].id }}" 
+                        class="company-link"
+                    >
+                        {{ user.company[Object.keys(user.company)[0]].name }}
+                    </router-link>
                     <span 
                         v-else 
                         v-for="company in user.company" 
