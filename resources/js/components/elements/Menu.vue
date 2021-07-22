@@ -1,9 +1,18 @@
 <template>
     <div class="navbar mx-auto font">
         <div class="not_auth mx-auto">
-            <router-link :to="{name: 'home'}">Головна</router-link>
-            <router-link :to="{name: 'products.index'}">Продукти</router-link>
-            <router-link to="/companies">Компанії</router-link>
+            <div v-if="!currentAuthorizedUser || currentAuthorizedUser.role.name !== 'Admin'">
+                <router-link :to="{name: 'home'}">Головна</router-link>
+                <router-link :to="{name: 'products.index'}">Продукти</router-link>
+                <router-link :to="{name: 'companies.index'}">Компанії</router-link>
+            </div>
+            <div v-else>
+                <router-link :to="{name: 'admin.index'}">Головна</router-link>
+                <router-link :to="{name: 'admin.products.index'}">Продукти</router-link>
+                <router-link :to="{name: 'admin.companies.index'}">Компанії</router-link>
+                <router-link  :to="{name: 'admin.users.index'}">Користувачі</router-link>
+            </div>
+            
             <div v-if="!currentAuthorizedUser">
                 <a href="/login" class="mr-2">Увійти</a>
                 <a href="/register">Зареєструватися</a>
@@ -25,8 +34,7 @@
                         <a href="/logout" class="dropdown-link" id="logout">Вийти</a>
                     </div>
                 </div>
-            </div>  
-            
+            </div>   
         </div>
     </div>
 </template>
