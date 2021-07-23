@@ -20,9 +20,6 @@
               Переглянути
             </vs-th>
             <vs-th> 
-              Редагувати
-            </vs-th>
-            <vs-th> 
               Видалити
             </vs-th>
           </vs-tr>
@@ -51,12 +48,7 @@
                 </router-link>
             </vs-td>
             <vs-td>
-                <router-link :to="{name: 'admin.users.edit', params: { id: tr.id} }">
-                    <i class="fas fa-edit"></i>
-                </router-link>
-            </vs-td>
-            <vs-td>
-                <i class="fas fa-trash-alt" @click="$emit('delete', tr.id)"></i>
+                <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
             </vs-td>
           </vs-tr>
         </template>
@@ -64,18 +56,33 @@
             <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
         </template>
       </vs-table>
+      <delete-modal
+            v-if="openModal"
+            title="Видалення користувача"
+            mainText="Ви дійсно хочете видалити цього користувача?"  
+            :deleteFunc="deleteUser"  
+            :id="userIdForDelete"
+            @cancel="cancelModal"
+        />
     </div>
 </template>
 
 <script>
 import {loadUsers} from '../../../../api/users'
+import {destroyUser} from '../../../../api/users'
+import DeleteModal from '../../../elements/DeleteModal.vue'
 
 export default {
+    components: {
+        DeleteModal
+    },
     data() {
         return {
             users: [],
             page: 1,
-            totalPages: 0
+            totalPages: 0,
+            openModal: false,
+            userIdForDelete: null
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -84,6 +91,11 @@ export default {
 
             if (vm.currentAuthorizedUser === null) {
                 window.location.href = '/login'
+            } else {
+                if (vm.currentAuthorizedUser.role.name !== 'Admin') {
+                    console.log(1)
+                    vm.$router.push({name: 'forbidden'})
+                }
             }
 
             loadUsers()
@@ -115,6 +127,28 @@ export default {
                 })
                 .catch((err) => console.error(err))
         },
+        showModal(id) {
+            this.userIdForDelete = id.toString()
+            this.openModal = true
+        },
+
+        cancelModal() {
+            this.userIdForDelete = null
+            this.openModal = false
+        },
+
+        async deleteUser(id) {
+            await destroyUser(id)
+                .then( response => {
+                    loadUsers()
+                        .then(response => {
+                            this.users = response.data.data
+                        })  
+                        .catch(err => console.error(err))
+                    console.log(`Користувача з ${id} було видалено`)
+                })
+                .catch(err => console.error(err))
+        }
     }
 }
 </script>
@@ -124,5 +158,28 @@ export default {
         font-size: 72px;
         font-weight: 600;
         margin-top: 250px;
+    }
+
+    .fa-edit {
+        margin-left: 15px;
+        color: rgb(15, 144, 196);
+        transition: .5s all;
+    }
+
+    .fa-edit:hover {
+        font-size: 18px;
+        color: rgb(11, 97, 131);
+    }
+
+    .fa-trash-alt {
+        margin-left: 10px;
+        color: rgb(170, 27, 27);
+        transition: .5s all;
+    }
+
+    .fa-trash-alt:hover {
+        cursor:pointer;
+        font-size: 18px;
+        color: rgb(126, 22, 22);
     }
 </style>

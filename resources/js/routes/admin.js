@@ -1,7 +1,6 @@
 import Admin from '../components/pages/Admin/AdminPanel'
 import UsersIndex from '../components/pages/Admin/Users/Index'
 import UsersShow from '../components/pages/Admin/Users/Show'
-import UsersEdit from '../components/pages/Admin/Users/Edit'
 import ProductsIndex from '../components/pages/Admin/Products/Index'
 import CompaniesIndex from '../components/pages/Admin/Companies/Index'
 
@@ -22,12 +21,6 @@ export default [
         path: '/admin/users/:id',
         name: 'admin.users.show',
         component: UsersShow
-    },
-
-    {
-        path: '/admin/users/:id/edit',
-        name: 'admin.users.edit',
-        component: UsersEdit
     },
 
     {

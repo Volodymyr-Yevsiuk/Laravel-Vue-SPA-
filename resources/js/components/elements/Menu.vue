@@ -101,7 +101,7 @@ export default {
         font-size: 18px;
         background: #fff;
         position: relative;
-        z-index: 2px;
+        z-index: 5;
     }
 
     .dropdown:hover .dropdown-content {

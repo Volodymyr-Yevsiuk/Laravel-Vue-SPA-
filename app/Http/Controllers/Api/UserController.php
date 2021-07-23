@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\User\User as UserResource;
+use App\Http\Requests\User\UpdateRequest;
+use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -31,7 +34,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        $user->load('role');
+        $user->load('role', 'companies');
 
         return UserResource::make($user);
     }
@@ -44,6 +47,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return new UserResource($user);
     }
 }

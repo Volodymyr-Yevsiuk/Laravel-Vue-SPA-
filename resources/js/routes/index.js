@@ -10,7 +10,8 @@ export default new VueRouter({
         ...require('./products').default,
         ...require('./companies').default,
         ...require('./auth').default,
-        ...require('./admin').default
+        ...require('./admin').default,
+        ...require('./errors').default
     ],
     mode: 'history'
 })

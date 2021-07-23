@@ -31,7 +31,6 @@ import {loadCompanies} from '../../../api/companies'
 import {destroyCompany} from '../../../api/companies'
 import store from '../../../store/index'
 
-
 export default {
     components: {
         CompanyCard,
