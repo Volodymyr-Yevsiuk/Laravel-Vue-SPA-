@@ -43,9 +43,12 @@
                     <label for="created_at">Дата створення акаунта:</label>
                     <span id="created_at">{{ user.created_at }}</span>
                 </div>
-                <div class="content-block">
-                    <vs-button class="logout">
+                <div class="btns-block content-block">
+                    <vs-button class="btn" @click="toLogout">
                         <a href="/logout">Вийти з акаунта</a>
+                    </vs-button>
+                    <vs-button v-if="currentAuthorizedUser.role.name === 'Admin'" class="btn" @click="toAdmin">
+                        Адміністративна панель
                     </vs-button>
                 </div>
             </div>
@@ -54,6 +57,7 @@
             <h1 class="products-title">Ваші товари</h1>
             <div>
                 <vs-button class="create-button mx-auto" @click="toCreate">Створити продукт</vs-button>
+                <spinner v-if="loading"/>
                 <product-card 
                     v-for="product in products" 
                     :key="product.id"
@@ -78,14 +82,17 @@
 <script>
 import moment from 'moment'
 import ProductCard from '../../elements/ProductCard.vue'
-import {loadCompanyProducts} from '../../../api/companies'
 import DeleteModal from '../../elements/DeleteModal.vue'
+import Spinner from '../../elements/Spinner.vue'
+import {loadCompanyProducts} from '../../../api/companies'
 import {destroyProduct} from '../../../api/products'
+import store from '../../../store/index'
 
 export default {
     components: {
         ProductCard,
-        DeleteModal
+        DeleteModal,
+        Spinner 
     },
     data () {
         return {
@@ -96,7 +103,8 @@ export default {
             page: 1,
             totalPages: 0,
             openModal: false,
-            productIdForDelete: null
+            productIdForDelete: null,
+            loading: false
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -119,6 +127,7 @@ export default {
                 }
 
                 // load users products
+                vm.loading = true
                 loadCompanyProducts(vm.user.id)
                 .then(response => {
                     response.data.data.forEach(company => {
@@ -127,8 +136,12 @@ export default {
                             vm.products.push(product)
                         })
                     })
+                    vm.loading = false
                 })  
-                .catch(err => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                    vm.loading = true    
+                })
             } else {
                 window.location.href = '/login'
             }
@@ -141,13 +154,18 @@ export default {
         },
 
         changePage(page = 1) {
+            this.loading = true
             loadProducts (page)
                 .then((response) => {
                     this.products = response.data.data
                     this.totalPages = response.data.meta.last_page
                     this.page = response.data.meta.current_page
+                    this.loading = false
                 })
-                .catch((err) => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true    
+                })
         },
 
         show(id, target) {
@@ -158,6 +176,15 @@ export default {
 
         toCreate() {
             this.$router.push({name: 'products.create'})
+        },
+
+        toLogout() {
+            window.location.href = '/logout'
+        },
+
+        toAdmin() {
+            store.commit('changeIsAdmin', true)
+            this.$router.push({name: 'admin.index'})
         },
 
         showModal(id) {
@@ -173,6 +200,7 @@ export default {
         async deleteProduct(id) {
             await destroyProduct(id)
                 .then( response => {
+                    this.loading = true
                     loadCompanyProducts(this.user.id)
                         .then(response => {
                             this.products = []
@@ -182,8 +210,12 @@ export default {
                                     this.products.push(product)
                                 })
                             })
+                            this.loading = false
                         })  
-                        .catch(err => console.error(err))
+                        .catch(err => {
+                            console.error(err)
+                            this.loading = true    
+                        })
                     console.log(`Продукт було ${id} видалено`)
                 })
                 .catch(err => console.error(err))
@@ -220,6 +252,10 @@ export default {
         margin-bottom: 15px;
     }
 
+    .btns-block {
+        display: flex;
+    }
+
     .content-block:last-child {
         border-bottom: 0;
     }
@@ -235,7 +271,7 @@ export default {
         margin-bottom: 50px;
     }
 
-    .logout {
+    .btn {
         font-size: 16px;
         padding: 5px;
     }

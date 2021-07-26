@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="show-content mx-auto">
+            <spinner v-if="loading"/>
             <img :src="`/images/${product.image}`" class="product-img">
             <div class="d-flex product-block">
                 <label for="name">Назва:</label>
@@ -30,34 +31,47 @@
 
 <script>
 import {loadProduct} from '../../../api/products'
+import Spinner from '../../elements/Spinner.vue'
 
 export default {
+  components: { Spinner },
     data() {
         return {
             product: {},
             company: {},
-            prevRoute: ''
+            prevRoute: '',
+            loading: false
         }
     },
     async beforeRouteEnter (to, from, next) {
         await next(vm => {
+            vm.loading = true
             loadProduct(to.params.id)
                 .then(response => {
                     vm.product = response.data.data
                     vm.company = response.data.data.company
                     vm.prevRoute = from.path
+                    vm.loading = false
                 })
-                .catch(err => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                    vm.loading = true
+                })
         }) 
     },
     async beforeRouteUpdate (to, from, next) {
+        this.loading = true
         await loadProduct(to.params.id)
             .then(response => {
                     this.product = response.data.data
                     this.company = response.data.data.company
                     this.prevRoute = from.path
+                    this.loading = false
                 })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                this.loading = true
+            })
         next()
     }
 }

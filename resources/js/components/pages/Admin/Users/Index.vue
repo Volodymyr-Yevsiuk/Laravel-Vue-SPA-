@@ -25,32 +25,33 @@
           </vs-tr>
         </template>
         <template #tbody>
-          <vs-tr
-            :key="i"
-            v-for="(tr, i) in users"
-            :data="tr"
-          >
-            <vs-td>
-                <img :src="tr.profile_photo_path"/> 
-            </vs-td>
-            <vs-td>
-                {{ tr.name }}
-            </vs-td>
-            <vs-td>
-                {{ tr.email }}
-            </vs-td>
-            <vs-td>
-                {{ tr.role.name }}
-            </vs-td>
-            <vs-td>
-                <router-link :to="{name: 'admin.users.show', params: { id: tr.id} }">
-                    <i class="fas fa-eye"></i>
-                </router-link>
-            </vs-td>
-            <vs-td>
-                <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
-            </vs-td>
-          </vs-tr>
+            <spinner v-if="loading"/>
+            <vs-tr
+                :key="i"
+                v-for="(tr, i) in users"
+                :data="tr"
+            >
+                <vs-td>
+                    <img :src="tr.profile_photo_path"/> 
+                </vs-td>
+                <vs-td>
+                    {{ tr.name }}
+                </vs-td>
+                <vs-td>
+                    {{ tr.email }}
+                </vs-td>
+                <vs-td>
+                    {{ tr.role.name }}
+                </vs-td>
+                <vs-td>
+                    <router-link :to="{name: 'admin.users.show', params: { id: tr.id} }">
+                        <i class="fas fa-eye"></i>
+                    </router-link>
+                </vs-td>
+                <vs-td>
+                    <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
+                </vs-td>
+            </vs-tr>
         </template>
         <template #footer>
             <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
@@ -71,10 +72,12 @@
 import {loadUsers} from '../../../../api/users'
 import {destroyUser} from '../../../../api/users'
 import DeleteModal from '../../../elements/DeleteModal.vue'
+import Spinner from '../../../elements/Spinner.vue'
 
 export default {
     components: {
-        DeleteModal
+        DeleteModal,
+        Spinner
     },
     data() {
         return {
@@ -82,7 +85,8 @@ export default {
             page: 1,
             totalPages: 0,
             openModal: false,
-            userIdForDelete: null
+            userIdForDelete: null,
+            loading: false
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -93,39 +97,53 @@ export default {
                 window.location.href = '/login'
             } else {
                 if (vm.currentAuthorizedUser.role.name !== 'Admin') {
-                    console.log(1)
                     vm.$router.push({name: 'forbidden'})
                 }
             }
 
+            vm.loading = true
             loadUsers()
             .then(response => {
                 vm.users = response.data.data
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
+                vm.loading = false
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                vm.loading = true
+            })
         })
     },
     async beforeRouteUpdate (to, from, next) {
+        this.loading = true
         await loadUsers()
             .then(response => {
                 this.users = response.data.data
                 this.page = response.data.meta.current_page
                 this.totalPages = response.data.meta.last_page
+                this.loading = false
             })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                this.loading = true
+            })
             next()
     },
     methods: {
         async changePage(page = 1) {
+            this.loading = true
             await loadUsers (page)
                 .then((response) => {
                     this.users = response.data.data
                     this.totalPages = response.data.meta.last_page
                     this.page = response.data.meta.current_page
+                    this.loading = false
                 })
-                .catch((err) => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
         },
         showModal(id) {
             this.userIdForDelete = id.toString()
@@ -140,14 +158,23 @@ export default {
         async deleteUser(id) {
             await destroyUser(id)
                 .then( response => {
+                    this.loading = true
                     loadUsers()
                         .then(response => {
                             this.users = response.data.data
+                            this.totalPages = response.data.meta.last_page
+                            this.page = response.data.meta.current_page
+                            this.loading = false
                         })  
-                        .catch(err => console.error(err))
+                        .catch(err => {
+                            console.error(err)
+                            this.loading = true
+                        })
                     console.log(`Користувача з ${id} було видалено`)
                 })
-                .catch(err => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                })
         }
     }
 }

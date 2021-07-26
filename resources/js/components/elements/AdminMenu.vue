@@ -1,14 +1,12 @@
 <template>
     <div class="navbar mx-auto font">
         <div class="not_auth mx-auto">
-                <router-link :to="{name: 'home'}">Головна</router-link>
-                <router-link :to="{name: 'products.index'}">Продукти</router-link>
-                <router-link :to="{name: 'companies.index'}">Компанії</router-link>
-            <div v-if="!currentAuthorizedUser">
-                <a href="/login" class="mr-2">Увійти</a>
-                <a href="/register">Зареєструватися</a>
-            </div>
-            <dropdown v-else/> 
+            <router-link :to="{name: 'admin.index'}">Головна</router-link>
+            <router-link :to="{name: 'admin.products.index'}">Продукти</router-link>
+            <router-link :to="{name: 'admin.companies.index'}">Компанії</router-link>
+            <router-link :to="{name: 'admin.users.index'}">Користувачі</router-link>  
+            
+            <dropdown />
         </div>
     </div>
 </template>
@@ -16,8 +14,8 @@
 <script>
 import Dropdown from '../elements/ProfileDropdown.vue'
 export default {
+  components: { Dropdown },
     name: 'Menu',
-    components: { Dropdown }
 }
 </script>
 
@@ -41,4 +39,5 @@ export default {
         display: flex;
         justify-content: space-between;
     }
+
 </style>

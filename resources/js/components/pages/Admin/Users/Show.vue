@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="show-content mx-auto">
+            <spinner v-if="loading"/>
             <img :src="user.profile_photo_path" class="product-img">
             <div class="d-flex product-block">
                 <label for="name">Ім'я:</label>
@@ -55,12 +56,17 @@
 <script>
 import moment from 'moment'
 import {loadUser} from '../../../../api/users'
+import Spinner from '../../../elements/Spinner.vue'
 
 export default {
+    components: {
+        Spinner
+    },
     data() {
         return {
             user: {},
-            prevRoute: ''
+            prevRoute: '',
+            loading: false
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -69,11 +75,11 @@ export default {
                 window.location.href = '/login'
             } else {
                 if (vm.currentAuthorizedUser.role.name !== 'Admin') {
-                    console.log(1)
                     vm.$router.push({name: 'forbidden'})
                 }
             }
                 
+            vm.loading = true
             loadUser(to.params.id)
                 .then(response => {
                     vm.user = response.data.data
@@ -83,19 +89,33 @@ export default {
                     vm.user.created_at = moment(vm.user.created_at).format('L')
 
                     vm.prevRoute = from.path
+                    vm.loading = false
                 })
-                .catch(err => console.error(err))
+                .catch(err => {
+                    console.error(err)
+                    vm.loading = true
+                })
 
                 
         }) 
     },
     async beforeRouteUpdate (to, from, next) {
+        this.loading = true
         await loadUser(to.params.id)
             .then(response => {
                     this.user = response.data.data
+
+                    //datetime
+                    moment.locale('uk')
+                    this.user.created_at = moment(this.user.created_at).format('L')
+
                     this.prevRoute = from.path
+                    this.loading = false
                 })
-            .catch(err => console.error(err))
+            .catch(err => {
+                console.error(err)
+                this.loading = true
+            })
         next()
     }
 }

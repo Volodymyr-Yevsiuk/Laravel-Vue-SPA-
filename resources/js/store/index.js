@@ -7,7 +7,8 @@ const store = new Vuex.Store({
     state: {
         user: {
             current: null,
-        }
+        },
+        isAdmin: false
     },
 
     mutations: {
@@ -34,6 +35,9 @@ const store = new Vuex.Store({
                     Object.assign(state.user.current.company[index], company)
                 } 
             })
+        },
+        changeIsAdmin (state, value) {
+            state.isAdmin = value
         }
     }
 })

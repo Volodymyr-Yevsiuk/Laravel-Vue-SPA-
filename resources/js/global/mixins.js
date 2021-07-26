@@ -5,6 +5,9 @@ export default {
         currentAuthorizedUser() {
             store.commit('setCurrentUser', window.auth)
             return store.state.user.current
+        },
+        isAdmin() {
+            return store.state.isAdmin
         }
     }
 }
