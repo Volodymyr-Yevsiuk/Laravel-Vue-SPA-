@@ -20,10 +20,14 @@ class CompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $companiesQuery = Company::query();
-        $companies = $companiesQuery->paginate(10);
+        if ($q = $request->get('q')) {
+            $companies = Company::where('name', 'like', '%'.$q.'%')->paginate(10);
+        } else {
+            $companiesQuery = Company::query();
+            $companies = $companiesQuery->paginate(10);
+        }
 
         $companies->load('user');
 

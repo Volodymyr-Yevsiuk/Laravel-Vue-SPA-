@@ -1,29 +1,17 @@
 <template>
     <div class="text-center">
-        <span class="center">Користувачі</span>
-         <vs-table>
-        <template #thead>
-          <vs-tr>
-            <vs-th>
-              Фото
-            </vs-th>
-            <vs-th>
-              Ім'я
-            </vs-th>
-            <vs-th>
-              Електронна пошта
-            </vs-th>
-            <vs-th> 
-              Роль
-            </vs-th>
-            <vs-th> 
-              Переглянути
-            </vs-th>
-            <vs-th> 
-              Видалити
-            </vs-th>
-          </vs-tr>
-        </template>
+        <search v-model="searchText" @search="searchFunction"/>
+        <vs-table>
+            <template #thead>
+                <vs-tr>
+                    <vs-th>Фото</vs-th>
+                    <vs-th>Ім'я</vs-th>
+                    <vs-th>Електронна пошта</vs-th>
+                    <vs-th>Роль</vs-th>
+                    <vs-th>Переглянути</vs-th>
+                    <vs-th>Видалити</vs-th>
+                </vs-tr>
+            </template>
         <template #tbody>
             <spinner v-if="loading"/>
             <vs-tr
@@ -73,11 +61,13 @@ import {loadUsers} from '../../../../api/users'
 import {destroyUser} from '../../../../api/users'
 import DeleteModal from '../../../elements/DeleteModal.vue'
 import Spinner from '../../../elements/Spinner.vue'
+import Search from '../../../elements/Search.vue'
 
 export default {
     components: {
         DeleteModal,
-        Spinner
+        Spinner,
+        Search
     },
     data() {
         return {
@@ -86,7 +76,8 @@ export default {
             totalPages: 0,
             openModal: false,
             userIdForDelete: null,
-            loading: false
+            loading: false,
+            searchText: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -175,7 +166,22 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        }
+        },
+
+        searchFunction(event) {
+            this.loading = true
+            loadUsers({q: this.searchText})
+                .then(response => {
+                    this.users = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                    this.loading = false
+                })  
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
+        } 
     }
 }
 </script>

@@ -170,7 +170,7 @@ export default {
         font-size: 18px;
         padding: 5px;
         position: relative;
-        left: 38%;
+        margin: 0 auto;
         margin-bottom: 50px;
     }
 </style>

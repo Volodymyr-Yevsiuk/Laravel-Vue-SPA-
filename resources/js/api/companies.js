@@ -4,9 +4,7 @@ export const loadCompanies = async function (query) {
     return await axios({
         method: 'get',
         url: '/api/companies',
-        params: {
-            page: query
-        }
+        params: query
     })
 } 
 

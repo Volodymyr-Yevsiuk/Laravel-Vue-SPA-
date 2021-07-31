@@ -1,69 +1,55 @@
 <template>
     <div class="text-center">
-        <span class="center">Продукти</span>
-         <vs-table>
-        <template #thead>
-          <vs-tr>
-            <vs-th>
-              Фото
-            </vs-th>
-            <vs-th>
-              Назва
-            </vs-th>
-            <vs-th>
-              Ціна
-            </vs-th>
-            <vs-th> 
-              Власник
-            </vs-th>
-            <vs-th> 
-              Переглянути
-            </vs-th>
-            <vs-th> 
-              Редагувати
-            </vs-th>
-            <vs-th> 
-              Видалити
-            </vs-th>
-          </vs-tr>
-        </template>
-        <template #tbody>
-            <spinner v-if="loading"/>
-            <vs-tr
-                v-for="(product, i) in products"
-                :key="i"
-                :data="product"
-            >
-                <vs-td>
-                    <img :src="`/images/${product.image}`"/> 
-                </vs-td>
-                <vs-td>
-                    {{ product.name }}
-                </vs-td>
-                <vs-td>
-                    {{ product.price }}
-                </vs-td>
-                <vs-td>
-                    {{ product.company.name }}
-                </vs-td>
-                <vs-td>
-                    <router-link :to="{name: 'products.show', params: { id: product.id} }">
-                        <i class="fas fa-eye"></i>
-                    </router-link>
-                </vs-td>
-                <vs-td>
-                    <router-link :to="{name: 'products.edit', params: { id: product.id} }">
-                        <i class="fas fa-edit"></i>
-                    </router-link>
-                </vs-td>
-                <vs-td>
-                    <i class="fas fa-trash-alt" @click="showModal(product)"></i>
-                </vs-td>
-            </vs-tr>
-        </template>
-        <template #footer>
-            <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
-        </template>
+        <search v-model="searchText" @search="searchFunction"/>
+        <vs-table>
+            <template #thead>
+                <vs-tr>
+                    <vs-th>Фото</vs-th>
+                    <vs-th>Назва</vs-th>
+                    <vs-th>Ціна</vs-th>
+                    <vs-th>Власник</vs-th>
+                    <vs-th>Переглянути</vs-th>
+                    <vs-th>Редагувати</vs-th>
+                    <vs-th>Видалити</vs-th>
+                </vs-tr>
+            </template>
+            <template #tbody>
+                <spinner v-if="loading"/>
+                <vs-tr
+                    v-for="(product, i) in products"
+                    :key="i"
+                    :data="product"
+                >
+                    <vs-td>
+                        <img :src="`/images/${product.image}`"/> 
+                    </vs-td>
+                    <vs-td>
+                        {{ product.name }}
+                    </vs-td>
+                    <vs-td>
+                        {{ product.price }}
+                    </vs-td>
+                    <vs-td>
+                        {{ product.company.name }}
+                    </vs-td>
+                    <vs-td>
+                        <router-link :to="{name: 'products.show', params: { id: product.id} }">
+                            <i class="fas fa-eye"></i>
+                        </router-link>
+                    </vs-td>
+                    <vs-td>
+                        <router-link :to="{name: 'products.edit', params: { id: product.id} }">
+                            <i class="fas fa-edit"></i>
+                        </router-link>
+                    </vs-td>
+                    <vs-td>
+                        <i class="fas fa-trash-alt" @click="showModal(product)"></i>
+                    </vs-td>
+                </vs-tr>
+            </template>
+            <template #footer>
+                <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
+            </template>
       </vs-table>
       <delete-modal
             v-if="openModal"
@@ -80,12 +66,15 @@
 import {loadProducts} from '../../../../api/products'
 import {destroyProduct} from '../../../../api/products'
 import DeleteModal from '../../../elements/DeleteModal.vue'
+import Search from '../../../elements/Search.vue'
 import Spinner from '../../../elements/Spinner.vue'
+
 
 export default {
     components: {
         DeleteModal,
-        Spinner
+        Spinner,
+        Search
     },
     data() {
         return {
@@ -94,7 +83,8 @@ export default {
             totalPages: 0,
             openModal: false,
             productIdForDelete: null,
-            loading: false
+            loading: false,
+            searchText: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -183,7 +173,22 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        }
+        },
+
+        searchFunction(event) {
+            this.loading = true
+            loadProducts({q: this.searchText})
+                .then(response => {
+                    this.products = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                    this.loading = false
+                })  
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
+        } 
     }
 }
 </script>

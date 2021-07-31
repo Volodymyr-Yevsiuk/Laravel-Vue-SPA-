@@ -1,30 +1,16 @@
 <template>
     <div class="text-center">
-        <span class="center">Компанії</span>
+        <search v-model="searchText" @search="searchFunction"/>
          <vs-table>
         <template #thead>
           <vs-tr>
-            <vs-th>
-              Лого
-            </vs-th>
-            <vs-th>
-              Назва
-            </vs-th>
-            <vs-th>
-              Адреса
-            </vs-th>
-            <vs-th> 
-              Власник
-            </vs-th>
-            <vs-th> 
-              Переглянути
-            </vs-th>
-            <vs-th> 
-              Редагувати
-            </vs-th>
-            <vs-th> 
-              Видалити
-            </vs-th>
+            <vs-th>Лого</vs-th>
+            <vs-th>Назва</vs-th>
+            <vs-th>Адреса</vs-th>
+            <vs-th>Власник</vs-th>
+            <vs-th>Переглянути</vs-th>
+            <vs-th>Редагувати</vs-th>
+            <vs-th>Видалити</vs-th>
           </vs-tr>
         </template>
         <template #tbody>
@@ -82,11 +68,13 @@ import {destroyCompany} from '../../../../api/companies'
 import DeleteModal from '../../../elements/DeleteModal.vue'
 import store from '../../../../store/index'
 import Spinner from '../../../elements/Spinner.vue'
+import Search from '../../../elements/Search.vue'
 
 export default {
     components: {
         DeleteModal,
-        Spinner
+        Spinner,
+        Search
     },
     data() {
         return {
@@ -95,7 +83,8 @@ export default {
             totalPages: 0,
             openModal: false,
             companyIdForDelete: null,
-            loading: false
+            loading: false,
+            searchText: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -142,7 +131,7 @@ export default {
     methods: {
         async changePage(page = 1) {
             this.loading = true
-            await loadCompanies (page)
+            await loadCompanies ({page : page})
                 .then((response) => {
                     this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -180,7 +169,22 @@ export default {
                     console.log(`Компанію з ${id} було видалено`)
                 })
                 .catch(err => console.error(err))
-        }
+        },
+
+        searchFunction(event) {
+            this.loading = true
+            loadCompanies({q: this.searchText})
+                .then(response => {
+                    this.companies = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                    this.loading = false
+                })  
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
+        } 
     }
 }
 </script>

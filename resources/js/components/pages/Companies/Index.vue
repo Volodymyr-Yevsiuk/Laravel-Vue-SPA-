@@ -2,8 +2,9 @@
     <div>
         <div class="d-flex">
             <div class="d-flex content_block mx-auto content-center">
+                <search v-model="searchText" @search="searchFunction"/>
                 <vs-button class="create-button mx-auto" @click="toCreate">Зареєструвати компанію</vs-button>
-                <spinner v-if="loading"/>
+                <spinner v-if="loading" style="margin-top: 100px;"/>
                 <company-card 
                     v-for="company in companies" 
                     :key="company.id"
@@ -32,12 +33,14 @@ import Spinner from '../../elements/Spinner.vue'
 import {loadCompanies} from '../../../api/companies'
 import {destroyCompany} from '../../../api/companies'
 import store from '../../../store/index'
+import Search from '../../elements/Search.vue'
 
 export default {
     components: {
         CompanyCard,
         DeleteModal,
-        Spinner
+        Spinner,
+        Search
     },
     data () {
         return {
@@ -46,7 +49,8 @@ export default {
             totalPages: 0,
             companyIdForDelete: null,
             openModal: false,
-            loading: false
+            loading: false,
+            searchText: ''
         }
     },
     async beforeRouteEnter(to, from, next) {
@@ -83,7 +87,7 @@ export default {
     methods: {
         changePage(page = 1) {
             this.loading = true
-            loadCompanies (page)
+            loadCompanies ({page : page})
                 .then((response) => {
                     this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -137,7 +141,22 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        }
+        },
+
+        searchFunction(event) {
+            this.loading = true
+            loadCompanies({q: this.searchText})
+                .then(response => {
+                    this.companies = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                    this.loading = false
+                })  
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
+        } 
     }
 }
 </script>
@@ -152,7 +171,7 @@ export default {
         font-size: 18px;
         padding: 5px;
         position: relative;
-        left: 38%;
+        margin: 0 auto;
         margin-bottom: 50px;
     }
 </style>

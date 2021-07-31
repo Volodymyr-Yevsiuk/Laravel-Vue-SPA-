@@ -14,9 +14,14 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(15);
+        if ($q = $request->get('q')) {
+            $users = User::where('name', 'like', '%'.$q.'%')->paginate(15);
+        } else {
+            $users = User::paginate(15);
+        }
+        
         $users->load('role');
 
         return UserResource::collection($users);
