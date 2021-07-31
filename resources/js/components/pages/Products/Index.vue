@@ -2,6 +2,7 @@
     <div>
         <div class="d-flex">
             <div class="d-flex content_block mx-auto content-center">
+                <search v-model="searchText" @search="searchFunction"/>
                 <vs-button class="create-button mx-auto" @click="toCreate">Створити продукт</vs-button>
                 <spinner v-if="loading"/>
                 <product-card 
@@ -29,6 +30,7 @@
 import ProductCard from '../../elements/ProductCard.vue'
 import DeleteModal from '../../elements/DeleteModal.vue'
 import Spinner from '../../elements/Spinner.vue'
+import Search from '../../elements/Search.vue'
 import {loadProducts} from '../../../api/products'
 import {destroyProduct} from '../../../api/products'
 
@@ -36,7 +38,8 @@ export default {
     components: {
         ProductCard,
         DeleteModal,
-        Spinner
+        Spinner,
+        Search
     },
     data () {
         return {
@@ -45,7 +48,8 @@ export default {
             totalPages: 0,
             openModal: false,
             productIdForDelete: null,
-            loading: false
+            loading: false,
+            searchText: ''
         }
     },
     async beforeRouteEnter(to, from, next) {
@@ -82,7 +86,7 @@ export default {
     methods: {
         changePage(page = 1) {
             this.loading = true
-            loadProducts (page)
+            loadProducts ({page : page})
                 .then((response) => {
                     this.products = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -135,7 +139,22 @@ export default {
                 .catch(err => {
                     console.error(err)
                 })
-        }
+        },
+
+        searchFunction(event) {
+            this.loading = true
+            loadProducts({q: this.searchText})
+                .then(response => {
+                    this.products = response.data.data
+                    this.totalPages = response.data.meta.last_page
+                    this.page = response.data.meta.current_page
+                    this.loading = false
+                })  
+                .catch(err => {
+                    console.error(err)
+                    this.loading = true
+                })
+        } 
     }
 }
 </script>

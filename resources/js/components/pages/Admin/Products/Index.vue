@@ -30,34 +30,34 @@
         <template #tbody>
             <spinner v-if="loading"/>
             <vs-tr
+                v-for="(product, i) in products"
                 :key="i"
-                v-for="(tr, i) in products"
-                :data="tr"
+                :data="product"
             >
                 <vs-td>
-                    <img :src="`/images/${tr.image}`"/> 
+                    <img :src="`/images/${product.image}`"/> 
                 </vs-td>
                 <vs-td>
-                    {{ tr.name }}
+                    {{ product.name }}
                 </vs-td>
                 <vs-td>
-                    {{ tr.price }}
+                    {{ product.price }}
                 </vs-td>
                 <vs-td>
-                    {{ tr.company.name }}
+                    {{ product.company.name }}
                 </vs-td>
                 <vs-td>
-                    <router-link :to="{name: 'products.show', params: { id: tr.id} }">
+                    <router-link :to="{name: 'products.show', params: { id: product.id} }">
                         <i class="fas fa-eye"></i>
                     </router-link>
                 </vs-td>
                 <vs-td>
-                    <router-link :to="{name: 'products.edit', params: { id: tr.id} }">
+                    <router-link :to="{name: 'products.edit', params: { id: product.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
                 </vs-td>
                 <vs-td>
-                    <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
+                    <i class="fas fa-trash-alt" @click="showModal(product)"></i>
                 </vs-td>
             </vs-tr>
         </template>
@@ -119,7 +119,6 @@ export default {
             })
             .catch(err => {
                 console.error(err)
-                console.log(1)
                 vm.loading = true
             })
         })
@@ -142,7 +141,7 @@ export default {
     methods: {
         async changePage(page = 1) {
             this.loading = true
-            await loadProducts (page)
+            await loadProducts ({page: page})
                 .then((response) => {
                     this.products = response.data.data
                     this.totalPages = response.data.meta.last_page

@@ -84,7 +84,7 @@ class CompanyController extends Controller
             // resize uploaded image
             if ($image->isValid()){
                 $image = Image::make($request->file('image'))->resize(270, 150);
-                $rndStr = Str::random(10);
+                $rndStr = Str::uuid();
                 $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
                 $data['image'] = $rndStr.'.jpg';

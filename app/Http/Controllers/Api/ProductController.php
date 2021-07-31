@@ -20,8 +20,12 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $productsQuery = Product::query();
-        $products = $productsQuery->paginate(15);
+        if ($q = $request->get('q')) {
+            $products = Product::where('name', 'like', '%'.$q.'%')->paginate(15);
+        } else {
+            $productsQuery = Product::query();
+            $products = $productsQuery->paginate(15);
+        }
 
         $products->load('company');
 
@@ -37,7 +41,7 @@ class ProductController extends Controller
     public function store(StoreRequest $request)
     {   
         $image = Image::make($request->file('image'))->resize(270, 150);
-        $rndStr = Str::random(10);
+        $rndStr = Str::uuid();
         $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
         $data = $request->validated();

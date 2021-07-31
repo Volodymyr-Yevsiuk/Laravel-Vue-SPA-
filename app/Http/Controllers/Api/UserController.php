@@ -6,9 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\User\User as UserResource;
-use App\Http\Requests\User\UpdateRequest;
-use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {

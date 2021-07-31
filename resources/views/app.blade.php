@@ -24,8 +24,7 @@
     <body class="antialiased">
         <script>
                 @if (auth()->user())
-                window.auth= {!! json_encode(new App\Http\Resources\User\User(auth()->user()->load('companies'))
-                    , JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT | JSON_THROW_ON_ERROR) !!} ;
+                    window.auth= {!! json_encode(new \App\Http\Resources\User\User(auth()->user()->load('companies'))) !!} ;
                 @else
                     window.auth=null;
                 @endif

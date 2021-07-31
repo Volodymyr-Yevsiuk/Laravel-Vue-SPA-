@@ -1,7 +1,7 @@
 <template>
     <div>
-        <Menu v-if="!isAdmin"/>
-        <AdminMenu v-else/>
+        <AdminMenu v-if="isAdmin || $route.name.includes('admin')"/>
+        <Menu v-else/>
         <router-view></router-view>
     </div>
 </template>
