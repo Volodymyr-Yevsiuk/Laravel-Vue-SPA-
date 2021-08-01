@@ -12,40 +12,40 @@
                     <vs-th>Видалити</vs-th>
                 </vs-tr>
             </template>
-        <template #tbody>
-            <spinner v-if="loading"/>
-            <vs-tr
-                :key="i"
-                v-for="(tr, i) in users"
-                :data="tr"
-            >
-                <vs-td>
-                    <img :src="tr.profile_photo_path"/> 
-                </vs-td>
-                <vs-td>
-                    {{ tr.name }}
-                </vs-td>
-                <vs-td>
-                    {{ tr.email }}
-                </vs-td>
-                <vs-td>
-                    {{ tr.role.name }}
-                </vs-td>
-                <vs-td>
-                    <router-link :to="{name: 'admin.users.show', params: { id: tr.id} }">
-                        <i class="fas fa-eye"></i>
-                    </router-link>
-                </vs-td>
-                <vs-td>
-                    <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
-                </vs-td>
-            </vs-tr>
-        </template>
-        <template #footer>
-            <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
-        </template>
-      </vs-table>
-      <delete-modal
+            <template #tbody>
+                <spinner v-if="loading"/>
+                <vs-tr
+                    :key="i"
+                    v-for="(tr, i) in users"
+                    :data="tr"
+                >
+                    <vs-td>
+                        <img :src="tr.profile_photo_path"/> 
+                    </vs-td>
+                    <vs-td>
+                        {{ tr.name }}
+                    </vs-td>
+                    <vs-td>
+                        {{ tr.email }}
+                    </vs-td>
+                    <vs-td>
+                        {{ tr.role.name }}
+                    </vs-td>
+                    <vs-td>
+                        <router-link :to="{name: 'admin.users.show', params: { id: tr.id} }">
+                            <i class="fas fa-eye"></i>
+                        </router-link>
+                    </vs-td>
+                    <vs-td>
+                        <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
+                    </vs-td>
+                </vs-tr>
+            </template>
+            <template #footer>
+                <vs-pagination v-if="totalPages > 1" v-model="page" :length="totalPages" @input="changePage" />
+            </template>
+        </vs-table>
+        <delete-modal
             v-if="openModal"
             title="Видалення користувача"
             mainText="Ви дійсно хочете видалити цього користувача?"  
@@ -57,8 +57,7 @@
 </template>
 
 <script>
-import {loadUsers} from '../../../../api/users'
-import {destroyUser} from '../../../../api/users'
+import {loadUsers, destroyUser} from '../../../../api/users'
 import DeleteModal from '../../../elements/DeleteModal.vue'
 import Spinner from '../../../elements/Spinner.vue'
 import Search from '../../../elements/Search.vue'

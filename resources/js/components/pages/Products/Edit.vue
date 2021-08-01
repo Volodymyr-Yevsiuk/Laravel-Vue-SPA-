@@ -25,13 +25,11 @@ export default {
                 description: '',
                 image: '',
             },
-            prevRoutePath: '',
             productId: ''
         }
     },
     async beforeRouteEnter (to, from, next) {
         await next((vm) => {
-            vm.prevRoutePath = from.path
             if (vm.currentAuthorizedUser !== null) {
                 if (vm.currentAuthorizedUser.company !== null) {
                     vm.productId = to.params.id
@@ -50,7 +48,7 @@ export default {
         })
     },
     methods: {
-        editProduct (form) {
+        editProduct () {
             let formData = new FormData();
             const config = { 'content-type': 'multipart/form-data' };
             formData.set('name', this.form.name);
@@ -61,7 +59,7 @@ export default {
             
             updateProduct(formData, config, this.productId)
                 .then(() => {
-                    this.$router.push({name: 'dashboard'})
+                    this.$router.go(-1)
                 })
                 .catch((err) => console.error(err))
         }

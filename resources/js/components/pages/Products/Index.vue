@@ -134,7 +134,7 @@ export default {
                             console.error(err)
                             this.loading = true
                         })
-                    console.log(`Продукт було ${id} видалено`)
+                    console.log(`Продукт з id ${id} видалено`)
                 })
                 .catch(err => {
                     console.error(err)

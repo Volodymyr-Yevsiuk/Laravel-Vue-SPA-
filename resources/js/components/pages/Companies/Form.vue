@@ -63,7 +63,7 @@
                     <label for="description">Опис:</label>
                     <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть компанію"></textarea>
                 </div>
-                <vs-button type="submit" class="create-button">Створити</vs-button>
+                <vs-button type="submit" class="create-button">{{btnText}}</vs-button>
             </form>
         </div>
     </div>
@@ -78,6 +78,10 @@ export default {
         },
         showImage: {
             type: Boolean,
+            required: true
+        },
+        btnText: {
+            type: String,
             required: true
         }
     },

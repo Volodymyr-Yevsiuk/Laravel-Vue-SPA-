@@ -110,7 +110,7 @@ export default {
             this.$router.push({name: 'companies.create'})
         },
 
-         showModal(id) {
+        showModal(id) {
             this.companyIdForDelete = id
             this.openModal = true
         },

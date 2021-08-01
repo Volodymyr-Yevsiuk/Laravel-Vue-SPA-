@@ -4,6 +4,7 @@
             v-model="form"
             :showImage="false"
             @submit="createCompany"
+            btnText="Створити"
         />
     </div>
 </template>
@@ -25,7 +26,6 @@ export default {
                 address: '',
                 user_id: ''
             },
-            prevRoutePath: '',
             showAlert: false
         }
     },
@@ -38,7 +38,6 @@ export default {
     beforeRouteEnter (to, from, next) {
         
         next((vm) => {
-            vm.prevRoutePath = from.path
             vm.showAlert = from.name === 'products.create' ? true : false
             if (vm.currentAuthorizedUser !== null) {
                 vm.form.user_id = vm.currentAuthorizedUser.id
@@ -61,9 +60,8 @@ export default {
             
             storeCompany(formData, config)
             .then((response) => {
-                this.$router.push(this.prevRoutePath);
                 store.commit('createAuthUserCompany', response.data.data)
-                
+                this.$router.go(-1);
             })
             .catch((err) => console.error(err))
         }

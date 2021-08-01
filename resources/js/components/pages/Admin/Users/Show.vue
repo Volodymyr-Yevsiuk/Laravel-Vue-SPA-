@@ -3,23 +3,23 @@
         <div class="show-content mx-auto">
             <spinner v-if="loading"/>
             <img :src="user.profile_photo_path" class="product-img">
-            <div class="d-flex product-block">
+            <div class="product-block">
                 <label for="name">Ім'я:</label>
                 <span id="name">{{user.name}}</span>
             </div>
-            <div class="d-flex product-block">
+            <div class="product-block">
                 <label for="email">Електронна пошта:</label>
                 <span id="email">{{user.email}}</span>
             </div>
-            <div class="d-flex product-block">
+            <div class="product-block">
                 <label for="role">Роль:</label>
                 <span id="role">{{ user.role.name }}</span>
             </div>
-            <div class="d-flex product-block">
+            <div class="product-block">
                 <label for="created_at">Дата реєстрації:</label>
                 <span id="created_at">{{user.created_at}}</span>
             </div>
-            <div class="d-flex product-block">
+            <div class="product-block">
                 <label for="company">Компанії, якими володіє користувач:</label>
                 <span 
                         v-if="(Object.keys(user.company).length <= 0)" 
@@ -43,30 +43,42 @@
                         <router-link :to="{name: 'companies.show', params: { id: company.id }}" class="company-link">{{ company.name }}</router-link>,
                     </span>
             </div>
-            <div>
-                <router-link :to="{path: prevRoute}">
-                    Повернутися назад
-                    <i class="fas fa-long-arrow-alt-right"></i>
-                </router-link>
+             <div class="d-flex">
+                <vs-button class="btn" danger @click="showModal(user.id)">Видалити</vs-button>
             </div>
+            <div class="comeback" @click="$router.go(-1)">
+                Повернутися назад
+                <i class="fas fa-long-arrow-alt-right"></i>
+            </div>
+            <delete-modal
+                v-if="openModal"
+                title="Видалення користувача"
+                mainText="Ви дійсно хочете видалити цього користувача?"  
+                :deleteFunc="deleteUser"  
+                :id="user.id.toString()"
+                @cancel="cancelModal"
+            />
         </div>
     </div>
 </template>
 
 <script>
 import moment from 'moment'
-import {loadUser} from '../../../../api/users'
+import {loadUser, destroyUser} from '../../../../api/users'
 import Spinner from '../../../elements/Spinner.vue'
+import DeleteModal from '../../../elements/DeleteModal.vue'
 
 export default {
     components: {
-        Spinner
+        Spinner,
+        DeleteModal
     },
     data() {
         return {
             user: {},
             prevRoute: '',
-            loading: false
+            loading: false,
+            openModal: false
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -117,11 +129,50 @@ export default {
                 this.loading = true
             })
         next()
+    },
+    methods: {
+        showModal(id) {
+            this.openModal = true
+        },
+
+        cancelModal() {
+            this.openModal = false
+        },
+
+        async deleteUser(id) {
+            await destroyUser(id)
+                .then( response => {
+                    this.$router.go(-1)
+                    console.log(`Користувача з ${id} було видалено`)
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        },
     }
 }
 </script>
 
 <style scoped>
+
+    .d-flex {
+        display: flex;
+    }
+
+    .btn {
+        font-size: 18px;
+        padding: 5px;
+    }
+
+    .comeback {
+        margin-top: 20px;
+    }
+
+    .comeback:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
     .show-content {
         width: 900px;
         margin-top: 100px;

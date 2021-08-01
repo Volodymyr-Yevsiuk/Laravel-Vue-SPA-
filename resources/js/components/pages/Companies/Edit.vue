@@ -4,6 +4,7 @@
             v-model="form"
             :showImage="true"
             @submit="editCompany"
+            btnText="Редагувати"
         />
     </div>
 </template>
@@ -26,13 +27,11 @@ export default {
                 address: '',
                 user_id: ''
             },
-            prevRoutePath: '',
             companyId: ''
         }
     },
     beforeRouteEnter (to, from, next) {
         next((vm) => {
-            vm.prevRoutePath = from.path
             if (vm.currentAuthorizedUser !== null) {
                 vm.form.user_id = vm.currentAuthorizedUser.id
                 vm.companyId = to.params.id
@@ -59,7 +58,7 @@ export default {
             
             updateCompany(formData, config, this.companyId)
             .then((response) => {
-                this.$router.push(this.prevRoutePath);
+                this.$router.go(-1)
                 store.commit('updateAuthUserCompany', response.data.data)
             })
             .catch((err) => console.error(err))

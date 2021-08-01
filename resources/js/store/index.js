@@ -25,7 +25,7 @@ const store = new Vuex.Store({
                     index = key
                 } 
             })
-            delete state.user.current.company[index]
+            state.user.current.company.splice(index, 1)
         },
         updateAuthUserCompany (state, company) {
             let index = null   

@@ -42,7 +42,7 @@ class CompanyController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $image = Image::make($request->file('image'))->resize(100, 100);
+        $image = Image::make($request->file('image'))->resize(270, 150);
         $rndStr = Str::random(15);
         $image->save(public_path().'/images/'.$rndStr.'.jpg');
 

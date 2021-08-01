@@ -25,13 +25,10 @@ export default {
                 image: '',
                 company_id: ''
             },
-            prevRoutePath: '',
         }
     },
     beforeRouteEnter (to, from, next) {
         next((vm) => {
-            vm.prevRoutePath = from.path
-            
             if (vm.currentAuthorizedUser !== null) {
                 if (Object.keys(vm.currentAuthorizedUser.company).length > 0) {
                     if (Object.keys(vm.currentAuthorizedUser.company).length === 1) {
@@ -61,7 +58,7 @@ export default {
             
             storeProduct(formData, config)
                 .then(() => {
-                    this.$router.push({ path: this.prevRoutePath });
+                    this.$router.go(-1);
                 })
                 .catch((err) => console.error(err))
         }

@@ -43,7 +43,7 @@
                         </router-link>
                     </vs-td>
                     <vs-td>
-                        <i class="fas fa-trash-alt" @click="showModal(product)"></i>
+                        <i class="fas fa-trash-alt" @click="showModal(product.id)"></i>
                     </vs-td>
                 </vs-tr>
             </template>
