@@ -1,9 +1,18 @@
 <template>
     <div class="text-center">
         <search v-model="searchText" @search="searchFunction"/>
-         <vs-table>
+        <vs-button 
+            v-if="checked != ''"
+            danger
+            class="btn"
+            @click="showModal(checked)"
+        >
+            Видалити вибране
+        </vs-button>
+        <vs-table>
         <template #thead>
           <vs-tr>
+            <vs-th>Вибрані</vs-th>
             <vs-th>Лого</vs-th>
             <vs-th>Назва</vs-th>
             <vs-th>Адреса</vs-th>
@@ -17,33 +26,36 @@
             <spinner v-if="loading"/>
             <vs-tr
                 :key="i"
-                v-for="(tr, i) in companies"
-                :data="tr"
+                v-for="(company, i) in companies"
+                :data="company"
             >
                 <vs-td>
-                    <img :src="`/images/${tr.image}`"/> 
+                    <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(company.id)" :value="company.id" @change="selectItem($event.target)"/>
                 </vs-td>
                 <vs-td>
-                    {{ tr.name }}
+                    <img :src="`/images/${company.image}`"/> 
                 </vs-td>
                 <vs-td>
-                    {{ tr.address }}
+                    {{ company.name }}
                 </vs-td>
                 <vs-td>
-                    {{ tr.user.name }}
+                    {{ company.address }}
                 </vs-td>
                 <vs-td>
-                    <router-link :to="{name: 'companies.show', params: { id: tr.id} }">
+                    {{ company.user.name }}
+                </vs-td>
+                <vs-td>
+                    <router-link :to="{name: 'companies.show', params: { id: company.id} }">
                         <i class="fas fa-eye"></i>
                     </router-link>
                 </vs-td>
                 <vs-td>
-                    <router-link :to="{name: 'companies.edit', params: { id: tr.id} }">
+                    <router-link :to="{name: 'companies.edit', params: { id: company.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
                 </vs-td>
                 <vs-td>
-                    <i class="fas fa-trash-alt" @click="showModal(tr.id)"></i>
+                    <i class="fas fa-trash-alt" @click="showModal(company.id)"></i>
                 </vs-td>
             </vs-tr>
         </template>
@@ -52,10 +64,18 @@
         </template>
       </vs-table>
       <delete-modal
-            v-if="openModal"
+            v-if="openModal && (typeof companyIdForDelete) != 'object'"
             title="Видалення компанії"
             mainText="Ви дійсно хочете видалити цю компанію?"  
             :deleteFunc="deleteCompany"  
+            :id="companyIdForDelete"
+            @cancel="cancelModal"
+        />
+        <delete-modal
+            v-if="openModal && (typeof companyIdForDelete) == 'object'"
+            title="Видалення компаній"
+            mainText="Ви дійсно хочете видалити вибрані компанії?"  
+            :deleteFunc="deleteCompanies"  
             :id="companyIdForDelete"
             @cancel="cancelModal"
         />
@@ -63,8 +83,7 @@
 </template>
 
 <script>
-import {loadCompanies} from '../../../../api/companies'
-import {destroyCompany} from '../../../../api/companies'
+import {loadCompanies, destroyCompany, deleteSelectedCompanies} from '../../../../api/companies'
 import DeleteModal from '../../../elements/DeleteModal.vue'
 import store from '../../../../store/index'
 import Spinner from '../../../elements/Spinner.vue'
@@ -79,12 +98,13 @@ export default {
     data() {
         return {
             companies: [],
+            checked: [],
             page: 1,
             totalPages: 0,
             openModal: false,
             companyIdForDelete: null,
             loading: false,
-            searchText: ''
+            searchText: '',
         }
     },
     async beforeRouteEnter (to, from, next) {
@@ -144,7 +164,11 @@ export default {
                 })  
         },
         showModal(id) {
-            this.companyIdForDelete = id.toString()
+            if (Array.isArray(id)) {
+                this.companyIdForDelete = id
+            } else {
+                this.companyIdForDelete = id.toString()
+            }
             this.openModal = true
         },
 
@@ -158,6 +182,10 @@ export default {
                 .then( response => {
                     store.commit('deleteAuthUserCompany', response.data.data)
                     this.loading = true
+                    if (this.checked.includes(id)) {
+                        let index = this.checked.indexOf(id)
+                        this.checked.splice(index, 1)
+                    }
                     loadCompanies()
                         .then(response => {
                             this.companies = response.data.data
@@ -165,8 +193,32 @@ export default {
                             this.totalPages = response.data.meta.last_page
                             this.loading = false
                         })  
-                        .catch(err => console.error(err))
+                        .catch(err => {
+                            this.loading = true   
+                            console.error(err)
+                        })
                     console.log(`Компанію з ${id} було видалено`)
+                })
+                .catch(err => console.error(err))
+        },
+
+        async deleteCompanies(ids) {
+            await deleteSelectedCompanies({'ids' : ids})
+                .then(response => {
+                    store.commit('deleteSomeCompanies', response.data.data)
+                    this.loading = true
+                    this.checked = []
+                    loadCompanies()
+                        .then(response => {
+                            this.companies = response.data.data
+                            this.page = response.data.meta.current_page
+                            this.totalPages = response.data.meta.last_page
+                            this.loading = false
+                        })  
+                        .catch(err => {
+                            this.loading = true
+                            console.error(err)
+                        })
                 })
                 .catch(err => console.error(err))
         },
@@ -184,12 +236,27 @@ export default {
                     console.error(err)
                     this.loading = true
                 })
-        } 
+        },
+
+        selectItem(checkbox) {
+            let index = null
+            if (checkbox.checked) {
+                this.checked.push(checkbox.value) 
+            } else {
+                index = this.checked.indexOf(checkbox.value)
+                this.checked.splice(index, 1)
+            }
+        }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
+    .btn {
+        font-size: 18px;
+        padding: 5px;
+    }
 
     .center {
         font-size: 72px;
@@ -218,6 +285,11 @@ export default {
         cursor:pointer;
         font-size: 18px;
         color: rgb(126, 22, 22);
+    }
+
+    .checkbox {
+        width: 20px;
+        height: 20px;
     }
 
     

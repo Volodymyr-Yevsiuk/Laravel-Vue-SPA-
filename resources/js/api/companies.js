@@ -30,3 +30,7 @@ export const destroyCompany = async function (id) {
 export const loadCompanyProducts = async function (id) {
     return await axios.get(`/api/companies/user/${id}`)
 }
+
+export const deleteSelectedCompanies = async function (ids) {
+    return await axios.post('/api/companies/selected', ids)
+}

@@ -90,6 +90,9 @@ class ProductController extends Controller
                 $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
                 $data['image'] = $rndStr.'.jpg';
+                if ($data['image'] != $product->image) {
+                    unlink(public_path().'/images/'.$product->image);
+                }
             }
         }
 
@@ -109,7 +112,24 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
+        if (file_exists(public_path().'/images/'.$product->image)) {
+            unlink(public_path().'/images/'.$product->image);
+        }
 
         return new ProductResource($product);
+    }
+
+    public function deleteSelectedProducts(Request $request) 
+    {
+        $products = Product::whereIn('id', $request->get('ids'));
+        $images = $products->pluck('image');
+        
+        $products->delete();
+
+        foreach ($images as $image) {
+            if (file_exists(public_path().'/images/'.$image)) {
+                unlink(public_path().'/images/'.$image);
+            }  
+        }
     }
 }

@@ -17,14 +17,14 @@ use App\Http\Controllers\Api\CompanyController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    dd($request->user());
-});
 
-    Route::get('companies/user/{id}', [CompanyController::class, 'getCompanyProducts'])->name('companies.products');
 
-    Route::apiResources([
-        'users' => UserController::class,
-        'products' => ProductController::class,
-        'companies' => CompanyController::class
-    ]);
+Route::get('companies/user/{id}', [CompanyController::class, 'getCompanyProducts'])->name('companies.products');
+Route::post('companies/selected', [CompanyController::class, 'deleteSelectedCompanies'])->name('companies.selected');
+Route::post('products/selected', [ProductController::class, 'deleteSelectedProducts'])->name('products.selected');
+
+Route::apiResources([
+    'users' => UserController::class,
+    'products' => ProductController::class,
+    'companies' => CompanyController::class
+]);

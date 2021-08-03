@@ -1,9 +1,18 @@
 <template>
     <div class="text-center">
         <search v-model="searchText" @search="searchFunction"/>
+         <vs-button 
+            v-if="checked != ''"
+            danger
+            class="btn"
+            @click="showModal(checked)"
+        >
+            Видалити вибране
+        </vs-button>
         <vs-table>
             <template #thead>
                 <vs-tr>
+                    <vs-th>Вибрані</vs-th>
                     <vs-th>Фото</vs-th>
                     <vs-th>Назва</vs-th>
                     <vs-th>Ціна</vs-th>
@@ -19,7 +28,11 @@
                     v-for="(product, i) in products"
                     :key="i"
                     :data="product"
+                    ref="checks"
                 >
+                    <vs-td>
+                        <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(product.id)" :value="product.id" @change="selectItem($event.target)"/>
+                    </vs-td>
                     <vs-td>
                         <img :src="`/images/${product.image}`"/> 
                     </vs-td>
@@ -52,10 +65,18 @@
             </template>
       </vs-table>
       <delete-modal
-            v-if="openModal"
+            v-if="openModal && (typeof productIdForDelete) != 'object'"
             title="Видалення продукта"
             mainText="Ви дійсно хочете видалити цей продукт?"  
             :deleteFunc="deleteProduct"  
+            :id="productIdForDelete"
+            @cancel="cancelModal"
+        />
+        <delete-modal
+            v-if="openModal && (typeof productIdForDelete) == 'object'"
+            title="Видалення продуктів"
+            mainText="Ви дійсно хочете видалити вибрані продукти?"  
+            :deleteFunc="deleteProducts"  
             :id="productIdForDelete"
             @cancel="cancelModal"
         />
@@ -63,8 +84,7 @@
 </template>
 
 <script>
-import {loadProducts} from '../../../../api/products'
-import {destroyProduct} from '../../../../api/products'
+import {loadProducts, destroyProduct, deleteSelectedProducts} from '../../../../api/products'
 import DeleteModal from '../../../elements/DeleteModal.vue'
 import Search from '../../../elements/Search.vue'
 import Spinner from '../../../elements/Spinner.vue'
@@ -79,6 +99,7 @@ export default {
     data() {
         return {
             products: [],
+            checked: [],
             page: 1,
             totalPages: 0,
             openModal: false,
@@ -98,7 +119,7 @@ export default {
                     vm.$router.push({name: 'forbidden'})
                 }
             }
-
+            
             vm.loading = true
             loadProducts()
             .then(response => {
@@ -106,6 +127,7 @@ export default {
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
                 vm.loading = false
+                
             })
             .catch(err => {
                 console.error(err)
@@ -144,7 +166,11 @@ export default {
                 })
         },
         showModal(id) {
-            this.productIdForDelete = id.toString()
+            if (Array.isArray(id)) {
+                this.productIdForDelete = id
+            } else {
+                this.productIdForDelete = id.toString()
+            }
             this.openModal = true
         },
 
@@ -157,6 +183,10 @@ export default {
             await destroyProduct(id)
                 .then( response => {
                     this.loading = true
+                    if (this.checked.includes(id)) {
+                        let index = this.checked.indexOf(id)
+                        this.checked.splice(index, 1)
+                    }
                     loadProducts()
                         .then(response => {
                             this.products = response.data.data
@@ -175,6 +205,26 @@ export default {
                 })
         },
 
+        async deleteProducts(ids) {
+            await deleteSelectedProducts({'ids' : ids})
+                .then(response => {
+                    this.loading = true
+                    this.checked = []
+                    loadProducts()
+                        .then(response => {
+                            this.products = response.data.data
+                            this.page = response.data.meta.current_page
+                            this.totalPages = response.data.meta.last_page
+                            this.loading = false
+                        })  
+                        .catch(err => {
+                            this.loading = true
+                            console.error(err)
+                        })
+                })
+                .catch(err => console.error(err))
+        },
+
         searchFunction(event) {
             this.loading = true
             loadProducts({q: this.searchText})
@@ -188,12 +238,33 @@ export default {
                     console.error(err)
                     this.loading = true
                 })
+        },
+
+        selectItem(checkbox) {
+            let index = null
+            if (checkbox.checked) {
+                this.checked.push(checkbox.value) 
+            } else {
+                index = this.checked.indexOf(checkbox.value)
+                this.checked.splice(index, 1)
+            }
         } 
     }
 }
 </script>
 
 <style scoped>
+
+    .btn {
+        font-size: 18px;
+        padding: 5px;
+    }
+
+    .checkbox {
+        width: 20px;
+        height: 20px;
+    }
+
     .center {
         font-size: 72px;
         font-weight: 600;

@@ -68,7 +68,7 @@ export default {
                     vm.product = response.data.data
                     vm.company = response.data.data.company
                     vm.loading = false
-                    if (vm.currentAuthorizedUser.company != '') {
+                    if (vm.currentAuthorizedUser != null && vm.currentAuthorizedUser.company != '') {
                         if (Object.keys(vm.currentAuthorizedUser.company).length > 1) {
                             for (let i in vm.currentAuthorizedUser.company) {
                                 vm.companiesIds.push(vm.currentAuthorizedUser.company[i].id)
@@ -123,13 +123,16 @@ export default {
         },
 
         showEditDestroyIcons () {
-            if (this.currentAuthorizedUser.company != '') {
-                if (this.isUserCompanyProduct) {
-                    return true
-                } else if (this.currentAuthorizedUser.company[0].id === (this.product.company.id || this.product.company_id)) {
-                    return true
-                }  
-            }
+            if (this.currentAuthorizedUser != null) {
+                if (this.currentAuthorizedUser.company != '') {
+                    if (this.isUserCompanyProduct) {
+                        return true
+                    } else if (this.currentAuthorizedUser.company[0].id === (this.product.company.id || this.product.company_id)) {
+                        return true
+                    }  
+                }
+            } 
+            return false
         }
     }
 }

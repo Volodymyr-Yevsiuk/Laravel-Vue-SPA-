@@ -26,3 +26,7 @@ export const updateProduct = async function (formdata, config, id) {
 export const destroyProduct = async function (id) {
     return await axios.delete(`/api/products/${id}`)
 }
+
+export const deleteSelectedProducts = async function (ids) {
+    return await axios.post('/api/products/selected', ids)
+}

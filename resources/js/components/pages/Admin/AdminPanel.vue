@@ -13,6 +13,17 @@
 import store from '../../../store/index'
 
 export default {
+    beforeRouteEnter(to, from, next) {
+        next(vm => {
+            if (vm.currentAuthorizedUser === null) {
+                window.location.href = '/login'
+            } else {
+                if (vm.currentAuthorizedUser.role.name !== 'Admin') {
+                    vm.$router.push({name: 'forbidden'})
+                }
+            }
+        })
+    },
     methods: {
         goOutFromAdmin() {
             store.commit('changeIsAdmin', false)

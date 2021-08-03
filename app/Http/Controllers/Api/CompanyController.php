@@ -92,9 +92,11 @@ class CompanyController extends Controller
                 $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
                 $data['image'] = $rndStr.'.jpg';
+                if ($data['image'] != $company->image) {
+                    unlink(public_path().'/images/'.$company->image);
+                }
             }
         }
-
         $company->fill($data);
         $company->save();
 
@@ -110,15 +112,45 @@ class CompanyController extends Controller
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
+
+        if ($company->products) {
+            $relatedProducts = $company->products;
+        }
+
         $company->delete();
+
+        if (file_exists(public_path().'/images/'.$company->image)) {
+            unlink(public_path().'/images/'.$company->image);
+        } 
+
+        if ($relatedProducts) {
+            foreach ($relatedProducts as $product) {
+                if (file_exists(public_path().'/images/'.$product->image)) {
+                    unlink(public_path().'/images/'.$product->image);          
+                }  
+            }
+        } 
 
         return new CompanyResource($company);
     }
 
-    public function getCompanyProducts ($id) {
+    public function getCompanyProducts($id) 
+    {
 
         $user = User::findOrFail($id);
         $companies = $user->companies;
+
+        return CompanyResource::collection($companies);
+    }
+
+    public function deleteSelectedCompanies(Request $request) 
+    {
+        $ids = $request->get('ids');
+        $companies = Company::whereIn('id', $ids)->get();
+
+        foreach ($ids as $id) {
+            $this->destroy($id);
+        }
 
         return CompanyResource::collection($companies);
     }

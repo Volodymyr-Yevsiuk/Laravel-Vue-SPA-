@@ -19,14 +19,24 @@ const store = new Vuex.Store({
             state.user.current.company[Object.keys(state.user.current.company).length] = company
         },
         deleteAuthUserCompany (state, company) {
-            let index = null   
             Object.keys(state.user.current.company).find(key => { 
                 if (state.user.current.company[key].id === company.id) {
-                    index = key
+                    let index = key
+                    state.user.current.company.splice(index, 1)
                 } 
-            })
-            state.user.current.company.splice(index, 1)
+            }) 
+            
         },
+        deleteSomeCompanies (state, companies) {
+            companies.forEach(company => {
+                for (let key in state.user.current.company) {
+                    if (state.user.current.company[key].id === company.id) {
+                        let index = key
+                        state.user.current.company.splice(index, 1)
+                    } 
+                }
+            })
+        },  
         updateAuthUserCompany (state, company) {
             let index = null   
             Object.keys(state.user.current.company).find(key => { 
