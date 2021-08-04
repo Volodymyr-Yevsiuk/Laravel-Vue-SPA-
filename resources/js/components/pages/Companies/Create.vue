@@ -61,7 +61,7 @@ export default {
             storeCompany(formData, config)
             .then((response) => {
                 store.commit('createAuthUserCompany', response.data.data)
-                // this.$router.go(-1);
+                this.$router.go(-1);
             })
             .catch((err) => console.error(err))
         }

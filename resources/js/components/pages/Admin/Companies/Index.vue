@@ -11,16 +11,16 @@
         </vs-button>
         <vs-table>
         <template #thead>
-          <vs-tr>
-            <vs-th>Вибрані</vs-th>
-            <vs-th>Лого</vs-th>
-            <vs-th>Назва</vs-th>
-            <vs-th>Адреса</vs-th>
-            <vs-th>Власник</vs-th>
-            <vs-th>Переглянути</vs-th>
-            <vs-th>Редагувати</vs-th>
-            <vs-th>Видалити</vs-th>
-          </vs-tr>
+            <vs-tr>
+                <vs-th>Вибрані</vs-th>
+                <vs-th>Лого</vs-th>
+                <vs-th>Назва</vs-th>
+                <vs-th>Адреса</vs-th>
+                <vs-th>Власник</vs-th>
+                <vs-th>Переглянути</vs-th>
+                <vs-th>Редагувати</vs-th>
+                <vs-th>Видалити</vs-th>
+            </vs-tr>
         </template>
         <template #tbody>
             <spinner v-if="loading"/>
@@ -164,11 +164,7 @@ export default {
                 })  
         },
         showModal(id) {
-            if (Array.isArray(id)) {
-                this.companyIdForDelete = id
-            } else {
-                this.companyIdForDelete = id.toString()
-            }
+            this.companyIdForDelete = id
             this.openModal = true
         },
 
@@ -292,5 +288,4 @@ export default {
         height: 20px;
     }
 
-    
 </style>

@@ -43,13 +43,14 @@ class CompanyController extends Controller
     public function store(StoreRequest $request)
     {
         $image = Image::make($request->file('image'))->resize(270, 150);
-        $rndStr = Str::random(15);
-        $image->save(public_path().'/images/'.$rndStr.'.jpg');
+        $rndStr = Str::uuid();
 
         $data = $request->validated();
         $data['image'] = $rndStr.'.jpg';
 
         $company = Company::create($data);
+
+        $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
         return new CompanyResource($company);
     }
@@ -93,7 +94,9 @@ class CompanyController extends Controller
 
                 $data['image'] = $rndStr.'.jpg';
                 if ($data['image'] != $company->image) {
-                    unlink(public_path().'/images/'.$company->image);
+                    if (file_exists(public_path().'/images/'.$company->image)) {
+                        unlink(public_path().'/images/'.$company->image);
+                    } 
                 }
             }
         }
@@ -115,21 +118,18 @@ class CompanyController extends Controller
 
         if ($company->products) {
             $relatedProducts = $company->products;
+            foreach ($relatedProducts as $product) {
+                if (file_exists(public_path().'/images/'.$product->image)) {
+                    unlink(public_path().'/images/'.$product->image);          
+                }  
+            }
         }
 
         $company->delete();
 
         if (file_exists(public_path().'/images/'.$company->image)) {
             unlink(public_path().'/images/'.$company->image);
-        } 
-
-        if ($relatedProducts) {
-            foreach ($relatedProducts as $product) {
-                if (file_exists(public_path().'/images/'.$product->image)) {
-                    unlink(public_path().'/images/'.$product->image);          
-                }  
-            }
-        } 
+        }
 
         return new CompanyResource($company);
     }

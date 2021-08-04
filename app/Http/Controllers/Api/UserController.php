@@ -22,7 +22,7 @@ class UserController extends Controller
             $users = User::paginate(15);
         }
         
-        $users->load('role');
+        $users->load('role', 'companies');
 
         return UserResource::collection($users);
     }
@@ -50,8 +50,38 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        if ($user->companies) {
+            $relatedCompanies = $user->companies;
+            
+            foreach ($relatedCompanies as $company) {
+                if (file_exists(public_path().'/images/'.$company->image)) {
+                    unlink(public_path().'/images/'.$company->image);
+                }
+                if ($company->products) {
+                    $relatedProducts = $company->products;
+                    foreach ($relatedProducts as $product) {
+                        if (file_exists(public_path().'/images/'.$product->image)) {
+                            unlink(public_path().'/images/'.$product->image);
+                        }
+                    }
+                }
+            }
+        }
+
         $user->delete();
 
         return new UserResource($user);
+    }
+
+    public function deleteSelectedUsers(Request $request) {
+        $ids = $request->get('ids');
+        $users = User::whereIn('id', $ids)->get();
+
+        foreach ($ids as $id) {
+            $this->destroy($id);
+        }
+
+        return UserResource::collection($users);
     }
 }

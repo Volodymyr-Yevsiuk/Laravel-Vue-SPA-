@@ -166,11 +166,7 @@ export default {
                 })
         },
         showModal(id) {
-            if (Array.isArray(id)) {
-                this.productIdForDelete = id
-            } else {
-                this.productIdForDelete = id.toString()
-            }
+            this.productIdForDelete = id
             this.openModal = true
         },
 

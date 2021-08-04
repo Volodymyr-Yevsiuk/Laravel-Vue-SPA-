@@ -18,3 +18,7 @@ export const loadUser = async function (id) {
 export const destroyUser = async function (id) {
     return await axios.delete(`/api/users/${id}`)
 }
+
+export const deleteSelectedUsers = async function (ids) {
+    return await axios.post('/api/users/selected', ids)
+}

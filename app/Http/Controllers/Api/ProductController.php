@@ -42,12 +42,13 @@ class ProductController extends Controller
     {   
         $image = Image::make($request->file('image'))->resize(270, 150);
         $rndStr = Str::uuid();
-        $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
         $data = $request->validated();
         $data['image'] = $rndStr.'.jpg';
 
         $product = Product::create($data);
+
+        $image->save(public_path().'/images/'.$rndStr.'.jpg');
 
         return new ProductResource($product);
     }
@@ -86,13 +87,15 @@ class ProductController extends Controller
             // resize uploaded image
             if ($image->isValid()){
                 $image = Image::make($request->file('image'))->resize(270, 150);
-                $rndStr = Str::random(10);
-                $image->save(public_path().'/images/'.$rndStr.'.jpg');
+                $rndStr = Str::uuid();
 
                 $data['image'] = $rndStr.'.jpg';
                 if ($data['image'] != $product->image) {
-                    unlink(public_path().'/images/'.$product->image);
+                    if (file_exists(public_path().'/images/'.$product->image)) {
+                        unlink(public_path().'/images/'.$product->image);
+                    }
                 }
+                $image->save(public_path().'/images/'.$rndStr.'.jpg');
             }
         }
 
@@ -112,6 +115,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->delete();
+
         if (file_exists(public_path().'/images/'.$product->image)) {
             unlink(public_path().'/images/'.$product->image);
         }
