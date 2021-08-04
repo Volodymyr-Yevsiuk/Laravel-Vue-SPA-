@@ -31,7 +31,7 @@
                     ref="checks"
                 >
                     <vs-td>
-                        <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(product.id)" :value="product.id" @change="selectItem($event.target)"/>
+                        <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(product.id)" :value="product.id" @change="selectItem($event.target, product.name)"/>
                     </vs-td>
                     <vs-td>
                         <img :src="`/images/${product.image}`"/> 
@@ -56,7 +56,7 @@
                         </router-link>
                     </vs-td>
                     <vs-td>
-                        <i class="fas fa-trash-alt" @click="showModal(product.id)"></i>
+                        <i class="fas fa-trash-alt" @click="showModal(product.id, product.name)"></i>
                     </vs-td>
                 </vs-tr>
             </template>
@@ -67,7 +67,8 @@
       <delete-modal
             v-if="openModal && (typeof productIdForDelete) != 'object'"
             title="Видалення продукта"
-            mainText="Ви дійсно хочете видалити цей продукт?"  
+            mainText="Ви дійсно хочете видалити цей продукт -"  
+            :items="productNameForDelete"
             :deleteFunc="deleteProduct"  
             :id="productIdForDelete"
             @cancel="cancelModal"
@@ -75,7 +76,8 @@
         <delete-modal
             v-if="openModal && (typeof productIdForDelete) == 'object'"
             title="Видалення продуктів"
-            mainText="Ви дійсно хочете видалити вибрані продукти?"  
+            mainText="Ви дійсно хочете видалити вибрані продукти:"  
+            :items="selectedProductsNames"
             :deleteFunc="deleteProducts"  
             :id="productIdForDelete"
             @cancel="cancelModal"
@@ -100,10 +102,12 @@ export default {
         return {
             products: [],
             checked: [],
+            selectedProductsNames: [],
             page: 1,
             totalPages: 0,
             openModal: false,
             productIdForDelete: null,
+            productNameForDelete: '',
             loading: false,
             searchText: ''
         }
@@ -127,7 +131,12 @@ export default {
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
                 vm.loading = false
-                
+                vm.products.forEach(product => {
+                    if (localStorage.getItem(product.id)) {
+                        vm.selectedProductsNames.push(localStorage.getItem(product.id))
+                        vm.checked.push(product.id)
+                    }
+                })
             })
             .catch(err => {
                 console.error(err)
@@ -143,6 +152,12 @@ export default {
                 this.page = response.data.meta.current_page
                 this.totalPages = response.data.meta.last_page
                 this.loading = false
+                this.products.forEach(product => {
+                    if (localStorage.getItem(product.id)) {
+                        this.selectedProductsNames.push(localStorage.getItem(product.id))
+                        this.checked.push(product.id)
+                    }
+                })
             })
             .catch(err => {
                 console.error(err)
@@ -165,23 +180,28 @@ export default {
                     this.loading = true
                 })
         },
-        showModal(id) {
+        showModal(id, name) {
             this.productIdForDelete = id
+            this.productNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.productIdForDelete = null
+            this.productNameForDelete = ''
             this.openModal = false
         },
 
-        async deleteProduct(id) {
+        async deleteProduct(id, product) {
             await destroyProduct(id)
                 .then( response => {
                     this.loading = true
-                    if (this.checked.includes(id)) {
+                    if (this.checked.includes(id) && localStorage.getItem(id) && this.selectedProductsNames.includes(product)) {
                         let index = this.checked.indexOf(id)
                         this.checked.splice(index, 1)
+                        index = this.selectedProductsNames.indexOf(product)
+                        this.selectedProductsNames.splice(index, 1)
+                        localStorage.removeItem(id)
                     }
                     loadProducts()
                         .then(response => {
@@ -206,6 +226,8 @@ export default {
                 .then(response => {
                     this.loading = true
                     this.checked = []
+                    this.selectedProductsNames = []
+                    localStorage.clear()
                     loadProducts()
                         .then(response => {
                             this.products = response.data.data
@@ -236,13 +258,18 @@ export default {
                 })
         },
 
-        selectItem(checkbox) {
+        selectItem(checkbox, name) {
             let index = null
             if (checkbox.checked) {
                 this.checked.push(checkbox.value) 
+                this.selectedProductsNames.push(name)
+                localStorage.setItem(checkbox.value, name)
             } else {
                 index = this.checked.indexOf(checkbox.value)
                 this.checked.splice(index, 1)
+                index = this.selectedProductsNames.indexOf(name)
+                this.selectedProductsNames.splice(index, 1)
+                localStorage.removeItem(checkbox.value)
             }
         } 
     }

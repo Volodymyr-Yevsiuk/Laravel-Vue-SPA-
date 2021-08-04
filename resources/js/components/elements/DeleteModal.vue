@@ -20,6 +20,9 @@ export default {
         },
         id: {
             required: true
+        },
+        items: {
+            required: true
         }
     },
     methods: {
@@ -31,12 +34,12 @@ export default {
         show () {
             this.$modal.show('dialog', {
                 title: this.title,
-                text: this.mainText,
+                text: this.mainText + ` <br/>${this.items} ?`,
                 buttons: [
                     {   
                         title: 'Так',
                         handler: () => {
-                            this.deleteFunc(this.id)
+                            this.deleteFunc(this.id, this.items)
                             this.$modal.hide('dialog')
                             this.$emit('cancel')
                         }
