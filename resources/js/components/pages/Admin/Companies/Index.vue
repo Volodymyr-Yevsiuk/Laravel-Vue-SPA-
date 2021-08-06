@@ -9,6 +9,14 @@
         >
             Видалити вибране
         </vs-button>
+        <div class="checkAll">
+            <label for="checkAll">Вибрати все на сторінці</label>
+            <input type="checkbox" 
+                name="checkAll" 
+                class="checkbox" 
+                :checked="checkIfSelectAll()" 
+                @change="selectAll($event.target)"/>
+        </div>
         <vs-table>
         <template #thead>
             <vs-tr>
@@ -30,7 +38,13 @@
                 :data="company"
             >
                 <vs-td>
-                    <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(company.id)" :value="company.id" @change="selectItem($event.target)"/>
+                    <input type="checkbox" 
+                        name="ids" 
+                        class="checkbox" 
+                        :checked="checked.includes(company.id)" 
+                        :value="company.id" 
+                        @change="selectItem($event.target, company.name)"
+                    />
                 </vs-td>
                 <vs-td>
                     <img :src="`/images/${company.image}`"/> 
@@ -55,7 +69,7 @@
                     </router-link>
                 </vs-td>
                 <vs-td>
-                    <i class="fas fa-trash-alt" @click="showModal(company.id)"></i>
+                    <i class="fas fa-trash-alt" @click="showModal(company.id, company.name)"></i>
                 </vs-td>
             </vs-tr>
         </template>
@@ -66,8 +80,9 @@
       <delete-modal
             v-if="openModal && (typeof companyIdForDelete) != 'object'"
             title="Видалення компанії"
-            mainText="Ви дійсно хочете видалити цю компанію?"  
+            mainText="Ви дійсно хочете видалити цю компанію:"  
             :deleteFunc="deleteCompany"  
+            :items="companyNameForDelete"
             :id="companyIdForDelete"
             @cancel="cancelModal"
         />
@@ -76,6 +91,7 @@
             title="Видалення компаній"
             mainText="Ви дійсно хочете видалити вибрані компанії?"  
             :deleteFunc="deleteCompanies"  
+            :items="selectedCompaniesNames"
             :id="companyIdForDelete"
             @cancel="cancelModal"
         />
@@ -99,10 +115,12 @@ export default {
         return {
             companies: [],
             checked: [],
+            selectedCompaniesNames: [],
             page: 1,
             totalPages: 0,
             openModal: false,
             companyIdForDelete: null,
+            companyNameForDelete: '',
             loading: false,
             searchText: '',
         }
@@ -126,6 +144,15 @@ export default {
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
                 vm.loading = false
+
+                Object.keys(localStorage).map(key => {
+                    if (key.includes('company')) {
+                        const length = 'company-'.length
+                        let id = key.slice(length)
+                        vm.checked.push(id)
+                        vm.selectedCompaniesNames.push(localStorage.getItem(key))
+                    }
+                })
             })
             .catch(err => {
                 console.error(err)
@@ -133,25 +160,10 @@ export default {
             })
         })
     },
-    async beforeRouteUpdate (to, from, next) {
-        await loadCompanies()
-            this.loading = true
-            .then(response => {
-                this.companies = response.data.data
-                this.page = response.data.meta.current_page
-                this.totalPages = response.data.meta.last_page
-                this.loading = false
-            })
-            .catch(err => {
-                console.error(err)
-                this.loading = true
-            })            
-            next()
-    },
     methods: {
         async changePage(page = 1) {
             this.loading = true
-            await loadCompanies ({page : page})
+            await loadCompanies ({page : page, q: this.searchText})
                 .then((response) => {
                     this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -163,26 +175,31 @@ export default {
                     this.loading = true
                 })  
         },
-        showModal(id) {
+        showModal(id, name) {
             this.companyIdForDelete = id
+            this.companyNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.companyIdForDelete = null
+            this.companyNameForDelete = ''
             this.openModal = false
         },
 
-        async deleteCompany(id) {
+        async deleteCompany(id, company) {
             await destroyCompany(id)
                 .then( response => {
                     store.commit('deleteAuthUserCompany', response.data.data)
                     this.loading = true
-                    if (this.checked.includes(id)) {
+                    if (this.checked.includes(id) && localStorage.getItem(`company-${id}`) && this.selectedCompaniesNames.includes(company)) {
                         let index = this.checked.indexOf(id)
                         this.checked.splice(index, 1)
+                        index = this.selectedCompaniesNames.indexOf(company)
+                        this.selectedCompaniesNames.splice(index, 1)
+                        localStorage.removeItem(`company-${id}`)
                     }
-                    loadCompanies()
+                    loadCompanies({q: this.searchText})
                         .then(response => {
                             this.companies = response.data.data
                             this.page = response.data.meta.current_page
@@ -204,7 +221,15 @@ export default {
                     store.commit('deleteSomeCompanies', response.data.data)
                     this.loading = true
                     this.checked = []
-                    loadCompanies()
+                    this.selectedCompaniesNames = []
+                    
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes('company')) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+
+                    loadCompanies({q: this.searchText})
                         .then(response => {
                             this.companies = response.data.data
                             this.page = response.data.meta.current_page
@@ -234,20 +259,73 @@ export default {
                 })
         },
 
-        selectItem(checkbox) {
-            let index = null
+        selectItem(checkbox, name) {
             if (checkbox.checked) {
                 this.checked.push(checkbox.value) 
+                this.selectedCompaniesNames.push(name)
+                localStorage.setItem(`company-${checkbox.value}`, name)
             } else {
-                index = this.checked.indexOf(checkbox.value)
+                let index = this.checked.indexOf(checkbox.value)
                 this.checked.splice(index, 1)
+                index = this.selectedCompaniesNames.indexOf(name)
+                this.selectedCompaniesNames.splice(index, 1)
+                localStorage.removeItem(`company-${checkbox.value}`)
             }
+        },
+
+        selectAll(checkbox) {
+            if (checkbox.checked) {
+                this.companies.map(company => {
+                    this.checked.push(company.id)
+                    this.selectedCompaniesNames.push(company.name)
+                    localStorage.setItem(`company-${company.id}`, company.name)
+                })
+                this.getUniqueCheckedValues()
+            } else {
+                this.companies.map(company => {
+                    let index = this.checked.indexOf(company.id)
+                    this.checked.splice(index, 1)
+                    index = this.selectedCompaniesNames.indexOf(company.name)
+                    this.selectedCompaniesNames.splice(index, 1)
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes(`company-${company.id}`)) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+                })
+            }
+        },
+
+        checkIfSelectAll() {
+            if (this.companies != '') {
+                return this.companies.every(company => this.checked.includes(company.id))
+            }
+        },
+ 
+        getUniqueCheckedValues() {
+            const unique = (value, index, self) => {
+                return self.indexOf(value) === index
+            }
+
+            let uniq = this.checked.filter(unique)
+            this.checked = uniq
+            uniq = this.selectedCompaniesNames.filter(unique)
+            this.selectedCompaniesNames = uniq
         }
     }
 }
 </script>
 
 <style lang="scss" scoped>
+
+    .d-flex {
+        display: flex;
+    }
+
+    .checkAll {
+        text-align: left;
+        padding-left: 50px;
+    }
 
     .btn {
         font-size: 18px;

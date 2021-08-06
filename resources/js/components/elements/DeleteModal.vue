@@ -34,7 +34,7 @@ export default {
         show () {
             this.$modal.show('dialog', {
                 title: this.title,
-                text: this.mainText + ` <br/>${this.items} ?`,
+                text: `<span class="vue-dialog-sentence">${this.mainText}</span> <br/>${this.items} ?`,
                 buttons: [
                     {   
                         title: 'Так',
@@ -59,3 +59,18 @@ export default {
     }
 }
 </script>
+
+<style>
+
+    .vue-dialog-content-title {
+        font-size: 20px;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    .vue-dialog-sentence {
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+</style>

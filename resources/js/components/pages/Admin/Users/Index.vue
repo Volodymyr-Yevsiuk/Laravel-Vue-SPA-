@@ -9,6 +9,15 @@
         >
             Видалити вибране
         </vs-button>
+        <div class="checkAll">
+            <label for="checkAll">Вибрати все на сторінці</label>
+            <input type="checkbox" 
+                name="checkAll" 
+                class="checkbox" 
+                :checked="checkIfSelectAll()" 
+                @change="selectAll($event.target)"
+            />
+        </div>
         <vs-table>
             <template #thead>
                 <vs-tr>
@@ -30,7 +39,13 @@
                     :data="user"
                 >
                     <vs-td>
-                        <input type="checkbox" name="ids" class="checkbox" :checked="checked.includes(user.id)" :value="user.id" @change="selectItem($event.target)"/>
+                        <input v-if="currentAuthorizedUser.id != user.id"
+                            type="checkbox" 
+                            name="ids" 
+                            class="checkbox" 
+                            :checked="checked.includes(user.id)" 
+                            :value="user.id" 
+                            @change="selectItem($event.target, user.name)"/>
                     </vs-td>    
                     <vs-td>
                         <img :src="user.profile_photo_path"/> 
@@ -53,7 +68,7 @@
                         </router-link>
                     </vs-td>
                     <vs-td v-if="currentAuthorizedUser.id != user.id">
-                        <i class="fas fa-trash-alt" @click="showModal(user.id)"></i>
+                        <i class="fas fa-trash-alt" @click="showModal(user.id, user.name)"></i>
                     </vs-td>
                 </vs-tr>
             </template>
@@ -64,16 +79,18 @@
         <delete-modal
             v-if="openModal && (typeof userIdForDelete) != 'object'"
             title="Видалення користувача"
-            mainText="Ви дійсно хочете видалити цього користувача?"  
-            :deleteFunc="deleteUser"  
+            mainText="Ви дійсно хочете видалити цього користувача:"  
+            :deleteFunc="deleteUser" 
+            :items="userNameForDelete" 
             :id="userIdForDelete"
             @cancel="cancelModal"
         />
         <delete-modal
             v-if="openModal && (typeof userIdForDelete) == 'object'"
             title="Видалення користувачів"
-            mainText="Ви дійсно хочете видалити вибраних користувачів?"  
+            mainText="Ви дійсно хочете видалити вибраних користувачів:"  
             :deleteFunc="deleteUsers"  
+            :items="selectedUsersNames"
             :id="userIdForDelete"
             @cancel="cancelModal"
         />
@@ -96,10 +113,14 @@ export default {
         return {
             users: [],
             checked: [],
+            selectedUsersNames: [],
+            usersIds: [],
+            usersNames: [],
             page: 1,
             totalPages: 0,
             openModal: false,
             userIdForDelete: null,
+            userNameForDelete: '',
             loading: false,
             searchText: ''
         }
@@ -123,6 +144,22 @@ export default {
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
                 vm.loading = false
+
+                vm.users.map(user => {
+                    if (vm.currentAuthorizedUser.id != user.id) {
+                        vm.usersIds.push(parseInt(user.id))
+                        vm.usersNames.push(user.name)
+                    }
+                })
+
+                Object.keys(localStorage).map(key => {
+                    if (key.includes('user')) {
+                        const length = 'user-'.length
+                        let id = key.slice(length)
+                        vm.checked.push(parseInt(id))
+                        vm.selectedUsersNames.push(localStorage.getItem(key))
+                    }                
+                })
             })
             .catch(err => {
                 console.error(err)
@@ -130,61 +167,52 @@ export default {
             })
         })
     },
-    async beforeRouteUpdate (to, from, next) {
-        this.loading = true
-        await loadUsers()
-            .then(response => {
-                this.users = response.data.data
-                this.page = response.data.meta.current_page
-                this.totalPages = response.data.meta.last_page
-                this.loading = false
-            })
-            .catch(err => {
-                console.error(err)
-                this.loading = true
-            })
-            next()
-    },
     methods: {
         async changePage(page = 1) {
             this.loading = true
-            await loadUsers ({page : page})
+            await loadUsers ({page : page, q: this.searchText})
                 .then((response) => {
                     this.users = response.data.data
                     this.totalPages = response.data.meta.last_page
                     this.page = response.data.meta.current_page
                     this.loading = false
+                    this.updateUsersIdsAndNames()
                 })
                 .catch(err => {
                     console.error(err)
                     this.loading = true
                 })
         },
-        showModal(id) {
+        showModal(id, name) {
             this.userIdForDelete = id
+            this.userNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.userIdForDelete = null
+            this.userNameForDelete = ''
             this.openModal = false
         },
 
-        async deleteUser(id) {
+        async deleteUser(id, user) {
             await destroyUser(id)
                 .then( response => {
                     this.loading = true
-                    if (this.checked.includes(id)) {
-                        console.log(id)
+                    if (this.checked.includes(id) && localStorage.getItem(`user-${id}`) && this.selectedUsersNames.includes(user)) {
                         let index = this.checked.indexOf(id)
                         this.checked.splice(index, 1)
+                        index = this.selectedUsersNames.indexOf(user)
+                        this.selectedUsersNames.splice(index, 1)
+                        localStorage.removeItem(`user-${id}`)
                     }
-                    loadUsers()
+                    loadUsers({q: this.searchText})
                         .then(response => {
                             this.users = response.data.data
                             this.totalPages = response.data.meta.last_page
                             this.page = response.data.meta.current_page
                             this.loading = false
+                            this.updateUsersIdsAndNames()
                         })  
                         .catch(err => {
                             console.error(err)
@@ -202,12 +230,21 @@ export default {
                 .then(response => {
                     this.loading = true
                     this.checked = []
-                    loadUsers()
+                    this.selectedUsersNames = []
+
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes('user')) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+                    
+                    loadUsers({q: this.searchText})
                         .then(response => {
                             this.users = response.data.data
                             this.page = response.data.meta.current_page
                             this.totalPages = response.data.meta.last_page
                             this.loading = false
+                            this.updateUsersIdsAndNames()
                         })  
                         .catch(err => {
                             this.loading = true
@@ -217,13 +254,65 @@ export default {
                 .catch(err => console.error(err))
         },
 
-        selectItem(checkbox) {
+        updateUsersIdsAndNames() {
+            this.usersIds = []
+            this.usersNames = []
+            this.users.map(user => {
+                if (this.currentAuthorizedUser.id != user.id) {
+                    this.usersIds.push(parseInt(user.id))
+                    this.usersNames.push(user.name)
+                }
+            })
+        },
+
+        selectItem(checkbox, name) {
             const value = parseInt(checkbox.value)
             if (checkbox.checked) {
                 this.checked.push(value) 
+                this.selectedUsersNames.push(name)
+                localStorage.setItem(`user-${value}`, name)
             } else {
                 let index = this.checked.indexOf(value)
                 this.checked.splice(index, 1)
+                index = this.selectedUsersNames.indexOf(name)
+                this.selectedUsersNames.splice(index, 1)
+                localStorage.removeItem(`user-${value}`)
+            }
+        },
+
+        selectAll(checkbox) {
+            if (checkbox.checked) {
+                this.users.map(user => {
+                    if (this.currentAuthorizedUser.id != user.id) {
+                        this.checked.push(parseInt(user.id))
+                        this.selectedUsersNames.push(user.name)
+                        localStorage.setItem(`user-${user.id}`, user.name)
+                    }
+                })
+                this.getUniqueCheckedValues()
+            } else {
+                this.usersIds.map(id => {
+                    let index = this.checked.indexOf(id)
+                    this.checked.splice(index, 1)
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes(`user-${id}`)) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+                })
+
+                this.usersNames.map(name => {
+                    let index = this.selectedUsersNames.indexOf(name)
+                    this.selectedUsersNames.splice(index, 1)
+                })
+
+                
+            }
+        },
+
+        checkIfSelectAll() {
+            if (this.users != '') {
+                return this.usersIds.every(id => this.checked.includes(id))
             }
         },
 
@@ -235,17 +324,38 @@ export default {
                     this.totalPages = response.data.meta.last_page
                     this.page = response.data.meta.current_page
                     this.loading = false
+                    this.updateUsersIdsAndNames()
                 })  
                 .catch(err => {
                     console.error(err)
                     this.loading = true
                 })
-        } 
+        },
+
+        getUniqueCheckedValues() {
+            const unique = (value, index, self) => {
+                return self.indexOf(value) === index
+            }
+
+            let uniq = this.checked.filter(unique)
+            this.checked = uniq
+            uniq = this.selectedUsersNames.filter(unique)
+            this.selectedUsersNames = uniq
+        }
     }
 }
 </script>
 
 <style scoped>
+
+    .d-flex {
+        display: flex;
+    }
+
+    .checkAll {
+        text-align: left;
+        padding-left: 50px;
+    }
 
     .btn {
         font-size: 18px;

@@ -1,7 +1,7 @@
 <template>
     <div class="text-center">
         <search v-model="searchText" @search="searchFunction"/>
-         <vs-button 
+        <vs-button 
             v-if="checked != ''"
             danger
             class="btn"
@@ -9,6 +9,15 @@
         >
             Видалити вибране
         </vs-button>
+        <div class="checkAll">
+            <label for="checkAll">Вибрати все на сторінці</label>
+            <input type="checkbox" 
+                name="checkAll" 
+                class="checkbox" 
+                :checked="checkIfSelectAll()" 
+                @change="selectAll($event.target)"
+            />
+        </div>
         <vs-table>
             <template #thead>
                 <vs-tr>
@@ -131,10 +140,13 @@ export default {
                 vm.page = response.data.meta.current_page
                 vm.totalPages = response.data.meta.last_page
                 vm.loading = false
-                vm.products.forEach(product => {
-                    if (localStorage.getItem(product.id)) {
-                        vm.selectedProductsNames.push(localStorage.getItem(product.id))
-                        vm.checked.push(product.id)
+ 
+                Object.keys(localStorage).map(key => {
+                    if (key.includes('product')) {
+                        const length = 'product-'.length
+                        let id = key.slice(length)
+                        vm.checked.push(id)
+                        vm.selectedProductsNames.push(localStorage.getItem(key))
                     }
                 })
             })
@@ -144,31 +156,10 @@ export default {
             })
         })
     },
-    async beforeRouteUpdate (to, from, next) {
-        this.loading = true
-        await loadProducts()
-            .then(response => {
-                this.products = response.data.data
-                this.page = response.data.meta.current_page
-                this.totalPages = response.data.meta.last_page
-                this.loading = false
-                this.products.forEach(product => {
-                    if (localStorage.getItem(product.id)) {
-                        this.selectedProductsNames.push(localStorage.getItem(product.id))
-                        this.checked.push(product.id)
-                    }
-                })
-            })
-            .catch(err => {
-                console.error(err)
-                this.loading = true
-            })
-            next()
-    },
     methods: {
         async changePage(page = 1) {
             this.loading = true
-            await loadProducts ({page: page})
+            await loadProducts ({page: page, q: this.searchText})
                 .then((response) => {
                     this.products = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -196,14 +187,14 @@ export default {
             await destroyProduct(id)
                 .then( response => {
                     this.loading = true
-                    if (this.checked.includes(id) && localStorage.getItem(id) && this.selectedProductsNames.includes(product)) {
+                    if (this.checked.includes(id) && localStorage.getItem(`product-${id}`) && this.selectedProductsNames.includes(product)) {
                         let index = this.checked.indexOf(id)
                         this.checked.splice(index, 1)
                         index = this.selectedProductsNames.indexOf(product)
                         this.selectedProductsNames.splice(index, 1)
-                        localStorage.removeItem(id)
+                        localStorage.removeItem(`product-${id}`)
                     }
-                    loadProducts()
+                    loadProducts({q: this.searchText})
                         .then(response => {
                             this.products = response.data.data
                             this.totalPages = response.data.meta.last_page
@@ -227,8 +218,14 @@ export default {
                     this.loading = true
                     this.checked = []
                     this.selectedProductsNames = []
-                    localStorage.clear()
-                    loadProducts()
+
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes('product')) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+
+                    loadProducts({q: this.searchText})
                         .then(response => {
                             this.products = response.data.data
                             this.page = response.data.meta.current_page
@@ -259,24 +256,72 @@ export default {
         },
 
         selectItem(checkbox, name) {
-            let index = null
             if (checkbox.checked) {
                 this.checked.push(checkbox.value) 
                 this.selectedProductsNames.push(name)
-                localStorage.setItem(checkbox.value, name)
+                localStorage.setItem(`product-${checkbox.value}`, name)
             } else {
-                index = this.checked.indexOf(checkbox.value)
+                let index = this.checked.indexOf(checkbox.value)
                 this.checked.splice(index, 1)
                 index = this.selectedProductsNames.indexOf(name)
                 this.selectedProductsNames.splice(index, 1)
-                localStorage.removeItem(checkbox.value)
+                localStorage.removeItem(`product-${checkbox.value}`)
             }
-        } 
+        },
+
+        selectAll(checkbox) {
+            if (checkbox.checked) {
+                this.products.map(product => {
+                    this.checked.push(product.id)
+                    this.selectedProductsNames.push(product.name)
+                    localStorage.setItem(`product-${product.id}`, product.name)
+                })
+                this.getUniqueCheckedValues()
+            } else {
+                this.products.map(product => {
+                    let index = this.checked.indexOf(product.id)
+                    this.checked.splice(index, 1)
+                    index = this.selectedProductsNames.indexOf(product.name)
+                    this.selectedProductsNames.splice(index, 1)
+                    Object.keys(localStorage).map(key => {
+                        if (key.includes(`product-${product.id}`)) {
+                            localStorage.removeItem(key)
+                        }                
+                    })
+                })
+            }
+        },
+
+        checkIfSelectAll() {
+            if (this.products != '') {
+                return this.products.every(product => this.checked.includes(product.id))
+            }
+        },
+
+        getUniqueCheckedValues() {
+            const unique = (value, index, self) => {
+                return self.indexOf(value) === index
+            }
+
+            let uniq = this.checked.filter(unique)
+            this.checked = uniq
+            uniq = this.selectedProductsNames.filter(unique)
+            this.selectedProductsNames = uniq
+        }
     }
 }
 </script>
 
 <style scoped>
+
+    .d-flex {
+        display: flex;
+    }
+
+    .checkAll {
+        text-align: left;
+        padding-left: 50px;
+    }
 
     .btn {
         font-size: 18px;
