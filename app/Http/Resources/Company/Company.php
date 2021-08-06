@@ -3,6 +3,8 @@
 namespace App\Http\Resources\Company;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\User\User as UserResource;
+use App\Http\Resources\Product\Product as ProductResource;
 
 class Company extends JsonResource
 {
@@ -14,6 +16,15 @@ class Company extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->resource->id,
+            'name' => $this->resource->name,
+            'image' => $this->resource->image,
+            'description' => $this->resource->description,
+            'address' => $this->resource->address,
+            'employees' => $this->resource->employees,
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'products' => $this->resource->products
+        ];
     }
 }

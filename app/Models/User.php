@@ -27,6 +27,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
+        'company_id'
     ];
 
     /**
@@ -48,6 +50,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'name' => 'string',
+        'role_id' => 'string'
     ];
 
     /**
@@ -58,4 +62,15 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    // Relationships
+    public function role() 
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(Company::class);
+    }
 }

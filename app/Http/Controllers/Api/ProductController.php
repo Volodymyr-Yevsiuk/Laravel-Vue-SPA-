@@ -4,6 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Http\Resources\Product\Product as ProductResource;
+use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\UpdateRequest;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -12,9 +18,18 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($q = $request->get('q')) {
+            $products = Product::where('name', 'like', '%'.$q.'%')->paginate(15);
+        } else {
+            $productsQuery = Product::query();
+            $products = $productsQuery->paginate(15);
+        }
+
+        $products->load('company');
+
+        return ProductResource::collection($products);
     }
 
     /**
@@ -23,9 +38,19 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(StoreRequest $request)
+    {   
+        $image = Image::make($request->file('image'))->resize(270, 150);
+        $rndStr = Str::uuid();
+
+        $data = $request->validated();
+        $data['image'] = $rndStr.'.jpg';
+
+        $product = Product::create($data);
+
+        $image->save(public_path().'/images/'.$rndStr.'.jpg');
+
+        return new ProductResource($product);
     }
 
     /**
@@ -36,7 +61,10 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->load('company');
+
+        return new ProductResource($product);
     }
 
     /**
@@ -46,9 +74,35 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        //
+        $product = Product::findOrFail($id);
+
+        $data = $request->validated();
+        
+        if ($request->hasFile('image')) {
+            
+            $image = $request->file('image');
+
+            // resize uploaded image
+            if ($image->isValid()){
+                $image = Image::make($request->file('image'))->resize(270, 150);
+                $rndStr = Str::uuid();
+
+                $data['image'] = $rndStr.'.jpg';
+                if ($data['image'] != $product->image) {
+                    if (file_exists(public_path().'/images/'.$product->image)) {
+                        unlink(public_path().'/images/'.$product->image);
+                    }
+                }
+                $image->save(public_path().'/images/'.$rndStr.'.jpg');
+            }
+        }
+
+        $product->fill($data);
+        $product->save();
+
+        return new ProductResource($product);
     }
 
     /**
@@ -59,6 +113,27 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        if (file_exists(public_path().'/images/'.$product->image)) {
+            unlink(public_path().'/images/'.$product->image);
+        }
+
+        return new ProductResource($product);
+    }
+
+    public function deleteSelectedProducts(Request $request) 
+    {
+        $products = Product::whereIn('id', $request->get('ids'));
+        $images = $products->pluck('image');
+        
+        $products->delete();
+
+        foreach ($images as $image) {
+            if (file_exists(public_path().'/images/'.$image)) {
+                unlink(public_path().'/images/'.$image);
+            }  
+        }
     }
 }

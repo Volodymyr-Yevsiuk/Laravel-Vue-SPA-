@@ -21,8 +21,14 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
+        $companies = \App\Models\Company::pluck('id');
+
         return [
-            //
+            'name' => $this->faker->text(rand(10, 30)),
+            'price' => rand(20, 100),
+            'image' => '1.jpg',
+            'description' => $this->faker->realText(500),
+            'company_id' => $companies->random(),
         ];
     }
 }

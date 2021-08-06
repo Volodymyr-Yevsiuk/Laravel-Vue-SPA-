@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Http\Resources\User\User as UserResource;
 
 class UserController extends Controller
 {
@@ -12,20 +14,17 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        if ($q = $request->get('q')) {
+            $users = User::where('name', 'like', '%'.$q.'%')->paginate(15);
+        } else {
+            $users = User::paginate(15);
+        }
+        
+        $users->load('role', 'companies');
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return UserResource::collection($users);
     }
 
     /**
@@ -36,19 +35,10 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+        $user = User::findOrFail($id);
+        $user->load('role', 'companies');
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        return UserResource::make($user);
     }
 
     /**
@@ -59,6 +49,39 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        if ($user->companies) {
+            $relatedCompanies = $user->companies;
+            
+            foreach ($relatedCompanies as $company) {
+                if (file_exists(public_path().'/images/'.$company->image)) {
+                    unlink(public_path().'/images/'.$company->image);
+                }
+                if ($company->products) {
+                    $relatedProducts = $company->products;
+                    foreach ($relatedProducts as $product) {
+                        if (file_exists(public_path().'/images/'.$product->image)) {
+                            unlink(public_path().'/images/'.$product->image);
+                        }
+                    }
+                }
+            }
+        }
+
+        $user->delete();
+
+        return new UserResource($user);
+    }
+
+    public function deleteSelectedUsers(Request $request) {
+        $ids = $request->get('ids');
+        $users = User::whereIn('id', $ids)->get();
+
+        foreach ($ids as $id) {
+            $this->destroy($id);
+        }
+
+        return UserResource::collection($users);
     }
 }
