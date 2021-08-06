@@ -34,8 +34,9 @@
             <delete-modal
                 v-if="openModal"
                 title="Видалення компанії"
-                mainText="Ви дійсно хочете видалити компанію?"  
-                :deleteFunc="deleteCompany"  
+                mainText="Ви дійсно хочете видалити компанію:"  
+                :deleteFunc="deleteCompany"
+                :items="company.name"  
                 :id="company.id"
                 @cancel="cancelModal"
             />

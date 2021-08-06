@@ -8,7 +8,7 @@
                      <router-link  :to="{name: 'products.edit', params: { id: product.id} }">
                         <i class="fas fa-edit"></i>
                     </router-link>
-                    <i class="fas fa-trash-alt" @click="$emit('delete', product.id)"></i>
+                    <i class="fas fa-trash-alt" @click="$emit('delete', product.id, product.name)"></i>
                 </div>
             </div>
             <div class="def-block">

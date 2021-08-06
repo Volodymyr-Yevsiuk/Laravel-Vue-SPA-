@@ -11,6 +11,7 @@
                         v-model="form.name" 
                         class="form-input" 
                         placeholder="Введіть назву продукта"
+                        required
                     />
                 </div>
                 <div class="form-block">
@@ -21,7 +22,9 @@
                         id="price" 
                         v-model="form.price" 
                         class="form-input" 
-                        placeholder="Введіть ціну продукта"/>
+                        placeholder="Введіть ціну продукта"
+                        required
+                    />
                 </div>
                 <div class="form-block" v-if="(Object.keys(currentAuthorizedUser.company).length > 1) && showCompanies">
                     <label for="companies">Компанія:</label>
@@ -32,6 +35,7 @@
                         v-model="form.company_id" 
                         class="form-input" 
                         placeholder="Виберіть компанію"
+                        required
                     >
                         <vs-option 
                             v-for="company in currentAuthorizedUser.company"
@@ -43,9 +47,9 @@
                         </vs-option>
                     </vs-select>
                 </div>
-                 <div class="form-block">
+                 <div class="file-block form-block">
                     <label for="image">Зображення:</label>
-                    <vs-input 
+                    <input 
                         type="file" 
                         name="image" 
                         id="image" 
@@ -60,7 +64,7 @@
                 </div>
                 <div class="textarea-block">
                     <label for="description">Опис:</label>
-                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть продукт"></textarea>
+                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть продукт" required></textarea>
                 </div>
                 <vs-button type="submit" class="create-button">{{ textBtn }}</vs-button>
             </form>
@@ -135,6 +139,11 @@ export default {
 
     .form-input {
         font-size: 16px;
+    }
+
+    .file-block {
+        display: flex;
+        flex-direction: column;
     }
 
     .form-block {

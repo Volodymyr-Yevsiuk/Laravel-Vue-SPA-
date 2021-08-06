@@ -71,9 +71,10 @@
         <delete-modal
             v-if="openModal"
             title="Видалення продукту"
-            mainText="Ви дійсно хочете видалити цей продукт?"  
+            mainText="Ви дійсно хочете видалити цей продукт:"  
             :deleteFunc="deleteProduct"  
             :id="productIdForDelete"
+            :items="productNameForDelete"
             @cancel="cancelModal"
         />
     </div>
@@ -104,6 +105,7 @@ export default {
             totalPages: 0,
             openModal: false,
             productIdForDelete: null,
+            productNameForDelete: '',
             loading: false
         }
     },
@@ -187,13 +189,15 @@ export default {
             this.$router.push({name: 'admin.index'})
         },
 
-        showModal(id) {
+        showModal(id, name) {
             this.productIdForDelete = id
+            this.productNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.productIdForDelete = null
+            this.productNameForDelete = ''
             this.openModal = false
         },
 

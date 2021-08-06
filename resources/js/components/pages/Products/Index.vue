@@ -18,8 +18,9 @@
         <delete-modal
             v-if="openModal"
             title="Видалення продукту"
-            mainText="Ви дійсно хочете видалити цей продукт?"  
+            mainText="Ви дійсно хочете видалити цей продукт:"  
             :deleteFunc="deleteProduct"  
+            :items="productNameForDelete"
             :id="productIdForDelete"
             @cancel="cancelModal"
         />
@@ -48,6 +49,7 @@ export default {
             totalPages: 0,
             openModal: false,
             productIdForDelete: null,
+            productNameForDelete: '',
             loading: false,
             searchText: ''
         }
@@ -68,25 +70,11 @@ export default {
                 })
         })
     },
-    async beforeRouteUpdate(to, from, next) {
-        this.loading = true
-        loadProducts()
-            .then((response) => {
-                    this.products = response.data.data
-                    this.totalPages = response.data.meta.last_page ? response.data.meta.last_page : 0
-                    this.page = response.data.meta.current_page
-                    this.loading = false
-                })
-            .catch(err => {
-                console.error(err)
-                this.loading = true
-            })
-        next()
-    },
+    
     methods: {
         changePage(page = 1) {
             this.loading = true
-            loadProducts ({page : page})
+            loadProducts ({page : page, q: this.searchText})
                 .then((response) => {
                     this.products = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -109,13 +97,15 @@ export default {
             this.$router.push({name: 'products.create'})
         },
 
-        showModal(id) {
+        showModal(id, name) {
             this.productIdForDelete = id
+            this.productNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.productIdForDelete = null
+            this.productNameForDelete = ''
             this.openModal = false
         },
 
@@ -123,7 +113,7 @@ export default {
             await destroyProduct(id)
                 .then( response => {
                     this.loading = true
-                    loadProducts()
+                    loadProducts({q: this.searchText})
                         .then(response => {
                             this.products = response.data.data
                             this.totalPages = response.data.meta.last_page
