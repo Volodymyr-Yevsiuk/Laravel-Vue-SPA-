@@ -89,7 +89,7 @@
         <delete-modal
             v-if="openModal && (typeof companyIdForDelete) == 'object'"
             title="Видалення компаній"
-            mainText="Ви дійсно хочете видалити вибрані компанії?"  
+            mainText="Ви дійсно хочете видалити вибрані компанії:"  
             :deleteFunc="deleteCompanies"  
             :items="selectedCompaniesNames"
             :id="companyIdForDelete"

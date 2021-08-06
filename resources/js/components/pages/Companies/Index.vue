@@ -18,9 +18,10 @@
         <delete-modal
             v-if="openModal"
             title="Видалення компанії"
-            mainText="Ви дійсно хочете видалити компанію?"  
+            mainText="Ви дійсно хочете видалити компанію:"  
             :deleteFunc="deleteCompany"  
             :id="companyIdForDelete"
+            :items="companyNameForDelete"
             @cancel="cancelModal"
         />
     </div>  
@@ -48,6 +49,7 @@ export default {
             page: 1,
             totalPages: 0,
             companyIdForDelete: null,
+            companyNameForDelete: '',
             openModal: false,
             loading: false,
             searchText: ''
@@ -69,25 +71,10 @@ export default {
                 })
         })
     },
-    async beforeRouteUpdate(to, from, next) {
-        this.loading = true
-        loadCompanies()
-            .then((response) => {
-                    this.companies = response.data.data
-                    this.totalPages = response.data.meta.last_page ? response.data.meta.last_page : 0
-                    this.page = response.data.meta.current_page
-                    this.loading = false
-                })
-            .catch(err => {
-                console.error(err)
-                this.loading = true
-            })
-        next()
-    },
     methods: {
         changePage(page = 1) {
             this.loading = true
-            loadCompanies ({page : page})
+            loadCompanies ({page : page, q: this.searchText})
                 .then((response) => {
                     this.companies = response.data.data
                     this.totalPages = response.data.meta.last_page
@@ -110,13 +97,15 @@ export default {
             this.$router.push({name: 'companies.create'})
         },
 
-        showModal(id) {
+        showModal(id, name) {
             this.companyIdForDelete = id
+            this.companyNameForDelete = name
             this.openModal = true
         },
 
         cancelModal() {
             this.companyIdForDelete = null
+            this.companyNameForDelete = ''
             this.openModal = false
         },
 
@@ -125,7 +114,7 @@ export default {
                 .then( response => {
                     store.commit('deleteAuthUserCompany', response.data.data)
                     this.loading = true
-                    loadCompanies()
+                    loadCompanies({q: this.searchText})
                         .then(response => {
                             this.companies = response.data.data
                             this.totalPages = response.data.meta.last_page

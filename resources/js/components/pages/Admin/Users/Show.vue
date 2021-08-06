@@ -44,7 +44,7 @@
                     </span>
             </div>
              <div class="d-flex">
-                <vs-button class="btn" danger @click="showModal(user.id)">Видалити</vs-button>
+                <vs-button class="btn" danger @click="showModal()">Видалити</vs-button>
             </div>
             <div class="comeback" @click="$router.go(-1)">
                 Повернутися назад
@@ -53,9 +53,10 @@
             <delete-modal
                 v-if="openModal"
                 title="Видалення користувача"
-                mainText="Ви дійсно хочете видалити цього користувача?"  
+                mainText="Ви дійсно хочете видалити цього користувача -"  
                 :deleteFunc="deleteUser"  
                 :id="user.id.toString()"
+                :items="user.name"
                 @cancel="cancelModal"
             />
         </div>
@@ -76,7 +77,6 @@ export default {
     data() {
         return {
             user: {},
-            prevRoute: '',
             loading: false,
             openModal: false
         }
@@ -100,7 +100,6 @@ export default {
                     moment.locale('uk')
                     vm.user.created_at = moment(vm.user.created_at).format('L')
 
-                    vm.prevRoute = from.path
                     vm.loading = false
                 })
                 .catch(err => {
@@ -121,7 +120,6 @@ export default {
                     moment.locale('uk')
                     this.user.created_at = moment(this.user.created_at).format('L')
 
-                    this.prevRoute = from.path
                     this.loading = false
                 })
             .catch(err => {
@@ -131,7 +129,7 @@ export default {
         next()
     },
     methods: {
-        showModal(id) {
+        showModal() {
             this.openModal = true
         },
 

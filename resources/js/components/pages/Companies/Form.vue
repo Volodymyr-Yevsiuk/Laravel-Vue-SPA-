@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container mx-auto">
-            <form method="POST" @submit.prevent="$emit('submit')" >
+            <form method="POST" @submit.prevent="$emit('submit')" class="form">
                 <div class="form-block">
                     <label for="name">Назва:</label>
                     <vs-input 
@@ -11,6 +11,7 @@
                         v-model="form.name" 
                         class="form-input" 
                         placeholder="Введіть назву компанії"
+                        required
                     />
                 </div>
                 <div class="form-block">
@@ -22,6 +23,7 @@
                         v-model="form.employees" 
                         class="form-input" 
                         placeholder="Виберіть приблизну к-сть працівників"
+                        required
                     >
                         <vs-option 
                             v-for="(number, i) in numbers"
@@ -33,9 +35,9 @@
                         </vs-option>
                     </vs-select>
                 </div>
-                 <div class="form-block">
+                 <div class="file-block form-block">
                     <label for="image">Логотип компанії(100х100):</label>
-                    <vs-input 
+                    <input
                         type="file" 
                         name="image" 
                         id="image" 
@@ -48,7 +50,7 @@
                         :src="`/images/${form.image}`" 
                     />
                 </div>
-                 <div class="form-block">
+                <div class="form-block">
                     <label for="address">Адреса:</label>
                     <vs-input 
                         type="text" 
@@ -57,11 +59,12 @@
                         v-model="form.address" 
                         class="form-input" 
                         placeholder="Місто, вулиця"
+                        required
                     />
                 </div>
                 <div class="textarea-block">
                     <label for="description">Опис:</label>
-                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть компанію"></textarea>
+                    <textarea name="description" id="description" v-model="form.description" placeholder="Опишіть компанію" required></textarea>
                 </div>
                 <vs-button type="submit" class="create-button">{{btnText}}</vs-button>
             </form>
@@ -100,9 +103,11 @@ export default {
             }
         }
     },
+    mounted() {console.log(this.$refs.inputFile)},
     methods: {
         loadImage (e) {
             this.value.image = e.target.files[0]
+            console.log(this.$refs.inputFile)
         } 
     }
 }
@@ -120,6 +125,11 @@ export default {
         font-size: 15px;
         padding: 5px;
         margin-top: 50px;
+    }
+
+    .file-block {
+        display: flex;
+        flex-direction: column;
     }
 
     .textarea-block {

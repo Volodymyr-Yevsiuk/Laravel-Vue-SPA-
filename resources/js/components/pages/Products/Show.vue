@@ -30,9 +30,10 @@
             <delete-modal
                 v-if="openModal"
                 title="Видалення продукту"
-                mainText="Ви дійсно хочете видалити цей продукт?"  
+                mainText="Ви дійсно хочете видалити цей продукт:"  
                 :deleteFunc="deleteProduct"  
                 :id="product.id"
+                :items="product.name"
                 @cancel="cancelModal"
             />
         </div>
